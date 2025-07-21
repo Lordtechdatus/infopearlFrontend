@@ -1,0 +1,162 @@
+/* Page Header */
+.page-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #005580 100%);
+  color: white;
+  padding: 6rem 0 3rem;
+  text-align: center;
+}
+
+.page-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.breadcrumb {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.breadcrumb .active {
+  color: var(--secondary-color);
+}
+
+/* About Company */
+.about-company {
+  padding: 6rem 0;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.about-text h2 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.about-text h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background-color: var(--secondary-color);
+}
+
+.about-text p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.image-placeholder {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #005580 100%);
+  height: 550px;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.image-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(45deg, rgba(230, 126, 34, 0.2) 0%, rgba(200, 107, 70, 0.2) 100%);
+  z-index: 1;
+}
+
+/* Our Values */
+.our-values {
+  background-color: #f8f9fa;
+  padding: 6rem 0;
+}
+
+.value-card {
+  margin-top: 2rem;
+}
+
+/* Why Choose Us */
+.why-choose-us {
+  padding: 6rem 0;
+}
+
+.features-grid {
+  margin-top: 3rem;
+}
+
+.feature-item {
+  text-align: center;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.feature-icon {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover .feature-icon {
+  color: var(--secondary-color);
+  transform: translateY(-10px);
+}
+
+.feature-item h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+@media screen and (max-width: 992px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  
+  .image-placeholder {
+    height: 300px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .page-header {
+    padding: 5rem 0 2rem;
+  }
+  
+  .page-header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .about-company,
+  .our-values,
+  .why-choose-us {
+    padding: 4rem 0;
+  }
+  
+  .about-text h2 {
+    font-size: 2rem;
+  }
+  
+  .about-text p {
+    font-size: 1rem;
+  }
+}
+
+.company-image {
+  max-width: 500px;
+  height: 500px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+}

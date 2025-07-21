@@ -1,0 +1,20 @@
+/* pagination.css - Styling for pagination buttons */
+
+/* Make all pagination buttons white */
+.pagination .page-item .page-link {
+  background-color: white !important;
+  border-color: #dee2e6;
+}
+
+/* Style for active page button */
+.pagination .page-item.active .page-link {
+  background-color: #4285f4 !important; 
+  color: white;
+  border-color: #4285f4;
+  z-index: 1;
+}
+
+/* Hover effect */
+.pagination .page-item:not(.active) .page-link:hover {
+  background-color: #f8f9fa !important;
+} 

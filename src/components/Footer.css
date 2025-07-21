@@ -1,0 +1,181 @@
+/* src/components/Footer.css */
+
+.footer {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 4rem 0 1rem;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap: 40px;
+}
+
+.footer-section {
+  margin-bottom: 20px;
+}
+
+.footer-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  display: inline-block;
+}
+
+.footer-section h2::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 50px;
+  height: 2px;
+  background-color: var(--secondary-color);
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.footer-logo img {
+  margin-right: 10px;
+}
+
+.footer-logo h2 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.footer-logo h2::after {
+  display: none;
+}
+
+.footer p {
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+.contact {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.contact span {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.contact i {
+  margin-right: 10px;
+  color: var(--secondary-color);
+}
+
+/* Social Icons */
+.footer-social-icons {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.social-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.footer-links a {
+  color: #f1f1f1;
+  transition: color 0.3s ease;
+  position: relative;
+  display: inline-block;
+  padding-left: 15px;
+  margin-bottom: 0;
+  text-decoration: none !important;
+  border-bottom: none !important;
+}
+
+.footer-links a::before {
+  display: none !important;
+}
+
+.footer-links a:hover {
+  color: var(--secondary-color);
+  transform: translateX(5px);
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 2rem;
+}
+
+.footer-bottom p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+/* Payment Methods Section */
+.payment-methods {
+  background-color: #0b5174;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.payment-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.payment-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.payment-card {
+  width: 55px;
+  height: 35px;
+  background-color: white;
+  border-radius: 4px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.amex {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png');
+}
+
+.mastercard {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png');
+}
+
+.visa {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/1280px-Visa_Inc._logo.svg.png');
+}
+
+.rupay {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/RuPay-Logo.png/1200px-RuPay-Logo.png');
+}
+
+.netbanking {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iMzAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHRleHQgeD0iMTAiIHk9IjIwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iOCIgZmlsbD0iIzAwMzM0RSI+TkVUIEJBTktJTkc8L3RleHQ+PC9zdmc+');
+}
+
+.emi {
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB3a…your-full-base64-data…');
+}

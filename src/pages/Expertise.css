@@ -1,0 +1,175 @@
+/* Expertise Overview */
+.expertise-overview {
+  padding: 4rem 0 2rem;
+}
+
+.expertise-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.expertise-text p {
+  font-size: 1.2rem;
+  line-height: 1.8;
+}
+
+/* Expertise Areas */
+.expertise-areas {
+  padding: 3rem 0 6rem;
+  background-color: #f8f9fa;
+}
+
+.expertise-grid {
+  margin-top: 3rem;
+}
+
+.expertise-card {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  padding: 3rem 2rem;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.expertise-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.expertise-icon {
+  font-size: 3rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+}
+
+.expertise-card h3 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+}
+
+.expertise-card p {
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+.expertise-card ul {
+  padding-left: 1.5rem;
+  margin-bottom: 0;
+}
+
+.expertise-card li {
+  margin-bottom: 0.8rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.expertise-card li::before {
+  content: "•";
+  color: var(--secondary-color);
+  font-weight: bold;
+  display: inline-block;
+  width: 1.5rem;
+  margin-left: -1.5rem;
+}
+
+/* Our Approach */
+.our-approach {
+  padding: 6rem 0;
+}
+
+.approach-steps {
+  max-width: 800px;
+  margin: 3rem auto 0;
+}
+
+.approach-step {
+  display: flex;
+  margin-bottom: 3rem;
+  align-items: flex-start;
+}
+
+.step-number {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  opacity: 0.2;
+  margin-right: 2rem;
+  line-height: 1;
+  min-width: 70px;
+  text-align: center;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-content h3 {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.step-content p {
+  line-height: 1.8;
+}
+
+@media screen and (max-width: 992px) {
+  .expertise-card {
+    padding: 2.5rem 1.5rem;
+  }
+  
+  .expertise-card h3 {
+    font-size: 1.6rem;
+  }
+  
+  .approach-step {
+    margin-bottom: 2.5rem;
+  }
+  
+  .step-number {
+    font-size: 2.5rem;
+    margin-right: 1.5rem;
+    min-width: 60px;
+  }
+  
+  .step-content h3 {
+    font-size: 1.6rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .expertise-overview,
+  .expertise-areas,
+  .our-approach {
+    padding: 4rem 0;
+  }
+  
+  .expertise-text p {
+    font-size: 1.1rem;
+  }
+  
+  .expertise-card {
+    padding: 2rem 1.5rem;
+  }
+  
+  .expertise-icon {
+    font-size: 2.5rem;
+  }
+  
+  .expertise-card h3 {
+    font-size: 1.5rem;
+  }
+  
+  .step-number {
+    font-size: 2rem;
+    margin-right: 1rem;
+    min-width: 50px;
+  }
+  
+  .step-content h3 {
+    font-size: 1.5rem;
+  }
+} 

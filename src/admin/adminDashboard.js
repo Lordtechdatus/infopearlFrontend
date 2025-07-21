@@ -1,0 +1,107 @@
+import React from 'react';
+import { Card, Row, Col } from 'react-bootstrap';
+import './adminDashboard.css';
+
+// Import management components
+import HeaderSettings from './ContentManagement/HeaderSettings';
+import LogoSettings from './ContentManagement/LogoSettings';
+import FooterSettings from './ContentManagement/FooterSettings';
+import InvoiceList from './invoices/InvoiceList';
+
+// Import customer, salary, and user management components
+import CustomerList from './customers/CustomerList';  
+import ManageSalary from './salaryslip/ManageSalary';
+import UserList from './users/UserList';
+
+const AdminDashboard = () => {
+  const adminInfo = {
+    name: "Admin User",
+    id: "ADM001"
+  };
+
+  // Create dashboard card component for reuse
+  const DashboardCard = ({ icon, title, description, href }) => {
+    const handleClick = () => {
+      if (href) {
+        window.location.href = href;
+      }
+    };
+    
+    return (
+      <div className="card" onClick={handleClick}>
+        <i className={`fas ${icon} card-icon`}></i>
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
+    );
+  };
+
+  return (
+    <div className="home-section">
+      <h1>Welcome to Admin Dashboard</h1>
+      
+      
+      <div className="mb-4">
+        <h5 className="border-bottom pb-2 mb-3">Content Management</h5>
+        <div className="cards-container">
+          <DashboardCard 
+            icon="fa-envelope"
+            title="Header Settings"
+            description="Update email and phone"
+            href="/admin/header"
+          />
+          <DashboardCard 
+            icon="fa-image"
+            title="Logo Management"
+            description="Change website logo"
+            href="/admin/logo"
+          />
+          <DashboardCard 
+            icon="fa-address-card"
+            title="Footer Settings"
+            description="Update contact information"
+            href="/admin/footer"
+          />
+          <DashboardCard 
+            icon="fa-images"
+            title="Gallery Management"
+            description="Add, edit, or remove gallery images"
+            href="/admin/gallery"
+          />
+        </div>
+      </div>
+      
+      <div className="mb-4">
+        <h5 className="border-bottom pb-2 mb-3">Invoice Management</h5>
+        <div className="cards-container">
+          <DashboardCard 
+            icon="fa-users"
+            title="Customer Management"
+            description="Manage all your customer data in one place"
+            href="/admin/customers"
+          />
+          <DashboardCard 
+            icon="fa-money-check-alt"
+            title="Salary Management"
+            description="Employee salary & payroll processing"
+            href="/admin/salary"
+          />
+           <DashboardCard 
+            icon="fa-file-invoice-dollar"
+            title="Invoices"
+            description="Handle customer invoices"
+            href="/admin/invoices"
+          />
+          <DashboardCard 
+            icon="fa-user-shield"
+            title="User Management"
+            description="Manage admin users and permissions"
+            href="/admin/users"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;

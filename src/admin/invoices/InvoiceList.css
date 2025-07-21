@@ -1,0 +1,157 @@
+/* Styles for InvoiceList Component */
+
+/* Main action buttons styling */
+.action-buttons .btn {
+  transition: all 0.3s ease;
+  margin-right: 8px;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.action-buttons .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.action-buttons .btn i {
+  margin-right: 6px;
+}
+
+/* Download buttons - primary styling */
+.download-btn {
+  background: linear-gradient(135deg, #3f51b5, #1a237e);
+  border: none;
+  padding: 8px 16px;
+  font-weight: 500;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+.download-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a237e, #3f51b5);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.download-btn:hover::before {
+  opacity: 1;
+}
+
+.download-btn:active {
+  transform: scale(0.95);
+}
+
+/* Monthly download dropdown styling */
+.monthly-dropdown button {
+  background: linear-gradient(135deg, #00695c, #004d40);
+  border: none;
+}
+
+.monthly-dropdown .dropdown-menu {
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.monthly-dropdown .dropdown-item {
+  padding: 8px 16px;
+  transition: background-color 0.2s ease;
+}
+
+.monthly-dropdown .dropdown-item:hover {
+  background-color: #e8f5e9;
+  color: #00695c;
+}
+
+/* CSV Success alert styling */
+.csv-success-alert {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  border-left: 4px solid #43a047;
+  color: #2e7d32;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: slideInDown 0.5s ease forwards;
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Individual invoice download button */
+.invoice-download-btn {
+  border-color: #2e7d32;
+  color: #2e7d32;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.invoice-download-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background-color: #2e7d32;
+  z-index: -1;
+  transition: width 0.3s ease;
+}
+
+.invoice-download-btn:hover {
+  color: white;
+}
+
+.invoice-download-btn:hover::before {
+  width: 100%;
+}
+
+/* Loading spinner for download */
+.download-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 2px solid white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Reset button styling */
+.reset-btn {
+  background-color: #f44336;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.reset-btn:hover {
+  background-color: #d32f2f;
+} 

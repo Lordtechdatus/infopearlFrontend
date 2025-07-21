@@ -1,0 +1,813 @@
+/* Top Bar Styles */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff !important;
+  color: #222;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e5e5;
+  z-index: 1000; /* Ensures top-bar stays above other elements */
+}
+
+.top-bar-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.contact-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  color: #004e6e;
+  margin: 0 10px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.contact-link i {
+  margin-right: 8px;
+  font-size: 1rem;
+  color: #004e6e;
+}
+
+.phone-flag {
+  height: 18px;
+  width: auto;
+  margin-right: 8px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 960px) {
+  .top-bar {
+    background-color: white;
+    padding: 10px 0;
+    text-align: center;
+  }
+
+  .top-bar-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+  }
+
+  .contact-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 5px;
+    font-size: 0.85rem;
+    color: #004e6e;
+  }
+
+  .contact-link:first-child {
+    margin-right: 8px;
+  }
+  
+  .contact-link:last-child {
+    margin-left: 8px;
+  }
+
+  .phone-flag {
+    height: 18px;
+    margin-right: 4px;
+  }
+
+  .navbar {
+    position: sticky;
+    top: 0;
+  }
+  
+  /* Account for proper positioning of mobile menu */
+  .nav-menu.active {
+    top: 120px; /* Account for top bar + navbar height */
+  }
+  
+  .navbar.scrolled .nav-menu.active {
+    top: 80px; /* When navbar is scrolled */
+  }
+}
+
+/* Body margin to prevent content from hiding behind top-bar */
+body {
+  margin-top: 93px; /* Adjust if top-bar height is more or less */
+}
+
+.top-bar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.top-bar-left {
+  flex: 1;
+}
+
+.contact-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  color: var(--primary-color);
+  margin-left: 20px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.contact-link:first-child {
+  margin-left: 0;
+}
+
+.contact-link:hover {
+  color: var(--secondary-color);
+}
+
+.contact-link i {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+.phone-flag {
+  height: 16px;
+  width: auto;
+  margin-right: 8px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.flag-icon {
+  height: 20px;
+  width: auto;
+  border-radius: 2px;
+}
+
+.top-bar-right {
+  display: none; /* No longer needed */
+}
+
+/* Adjust navbar position to account for top bar */
+.navbar {
+  background: var(--primary-color);
+  height: 100px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 1.2rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  width: 100%;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 80px;
+  max-width: 1500px;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  left: 0;
+}
+
+.logo-text {
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-left: 5px; /* Reduced */
+  letter-spacing: 0.5px;
+  color: #00394D;
+  position: relative;
+}
+
+.logo-text::after {
+  content: "INNOVATIONS IN TECHNOLOGY";
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  /* color: #00394D; */
+  /* opacity: 0.8; */
+}
+
+.desktop-logo-text {
+  display: inline;
+}
+
+.mobile-logo-text {
+  display: none;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  text-align: center;
+  margin-right: -20px;
+}
+
+.nav-item {
+  height: 100px;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-links {
+  color: white;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  height: 100%;
+  position: relative;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.nav-links:hover,
+.nav-links.active {
+  color: var(--secondary-color) !important;
+  background-color: transparent !important;
+}
+
+.nav-links.active::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 2px;
+  background-color: var(--secondary-color);
+  bottom: 10px; /* Move the underline lower to avoid overlap */
+  left: 25%;
+  transition: width 0.3s ease-in-out;
+  z-index: 0;
+}
+
+.contact-btn {
+  /* background-color: var(--secondary-color); */
+  /* background-color: var(--secondary-color); */
+  border-radius: 5px;
+  padding: 8px 16px;
+  margin-left: 10px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+  background-color: transparent !important;
+  color: var(--secondary-color) !important;
+  transform: none;
+}
+
+.menu-icon {
+  display: none;
+}
+
+.hamburger {
+  width: 30px;
+  height: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.hamburger span {
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background: white;
+  border-radius: 3px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: 0.25s ease-in-out;
+}
+
+.hamburger span:nth-child(1) {
+  top: 0px;
+}
+
+.hamburger span:nth-child(2) {
+  top: 9px;
+}
+
+.hamburger span:nth-child(3) {
+  top: 18px;
+}
+
+.hamburger.active span:nth-child(1) {
+  top: 9px;
+  transform: rotate(135deg);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+  left: -60px;
+}
+
+.hamburger.active span:nth-child(3) {
+  top: 9px;
+  transform: rotate(-135deg);
+}
+
+@media screen and (max-width: 960px) {
+  .top-bar {
+    background-color: white;
+    padding: 8px 0;
+    text-align: center;
+  }
+
+  .top-bar-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .contact-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 5px;
+    font-size: 0.85rem;
+    color: #004e6e;
+  }
+
+  .contact-link:first-child {
+    margin-right: 8px;
+  }
+  
+  .contact-link:last-child {
+    margin-left: 8px;
+  }
+
+  .phone-flag {
+    height: 18px;
+    margin-right: 4px;
+  }
+
+  .navbar {
+    position: sticky;
+    top: 0;
+    height: 90px;
+  }
+  
+  .navbar-container {
+    height: 70px;
+  }
+  
+  .nav-item {
+    height: 90px;
+  }
+  
+  .NavbarItems {
+    position: relative;
+  }
+
+  .nav-menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 90vh;
+    position: absolute;
+    top: 80px;
+    left: -100%;
+    opacity: 1;
+    transition: all 0.5s ease;
+    padding-top: 30px;
+    background-color: var(--primary-color);
+    z-index: 999;
+    overflow-y: auto;
+  }
+
+  .nav-menu.active {
+    background: var(--primary-color);
+    left: 0;
+    opacity: 1;
+    transition: all 0.5s ease;
+    z-index: 1;
+  }
+
+  .nav-item {
+    height: auto;
+    padding: 1rem 0;
+  }
+
+  .nav-links {
+    text-align: center;
+    padding: 1rem;
+    width: 100%;
+    display: table;
+    color: white;
+  }
+
+  .navbar-logo {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo-text {
+    font-size: 1.3rem !important;
+  }
+  
+  .logo-text::after {
+    font-size: 0.5rem;
+  }
+  
+  .menu-icon {
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    font-size: 1.8rem;
+    cursor: pointer;
+  }
+
+  .nav-links.active::after {
+    display: none;
+  }
+
+  .contact-btn {
+    margin-top: 10px;
+    margin-left: 0;
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .desktop-logo-text {
+    display: none;
+  }
+  
+  .mobile-logo-text {
+    display: inline;
+  }
+}
+
+/* Dropdown styles */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-toggle i {
+  margin-left: 5px;
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-toggle i.rotate {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  min-width: 180px;
+  padding: 10px 0;
+  margin: 0;
+  list-style: none;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 20px;
+  color: #00394D;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #ff9800 !important;
+  color: #fff !important;
+}
+
+/* Mobile dropdown styles */
+@media screen and (max-width: 960px) {
+  .dropdown-menu {
+    position: static;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+  
+  .dropdown-menu.show {
+    max-height: 200px;
+  }
+  
+  .dropdown-item {
+    padding: 10px 40px;
+    color: white;
+  }
+  
+  .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Add these styles for the Pay Now button */
+
+.pay-now-dropdown {
+  margin-right: 10px;
+}
+
+.pay-now-button {
+  /* background-color: #e74c3c; */
+  /* background-color: var(--accent-color); */
+  border-radius: 5px;
+  padding: 8px 16px !important;
+  margin-left: 10px;
+  color: white !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease;
+}
+
+.pay-now-button:hover {
+  background-color: transparent !important;
+  color: var(--secondary-color) !important;
+  transform: none;
+}
+
+.pay-now-button i {
+  margin-left: 5px;
+}
+
+.pay-now-dropdown .dropdown-menu {
+  min-width: 150px;
+  padding: 5px 0;
+}
+
+.pay-now-dropdown .dropdown-item {
+  color: #6b24b2;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px 20px;
+}
+
+.pay-now-dropdown .dropdown-item:hover {
+  background-color: #f5f5f5;
+  color: #e74c3c;
+}
+
+.navbar-logo-image {
+  height: 110px;
+  width: 110px;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 960px) {
+  .navbar-logo-image {
+    height: 90px;
+    width: 90px;
+  }
+  
+  /* Ensure the mobile menu covers the whole screen properly */
+  .nav-menu.active {
+    background: var(--primary-color);
+    left: 0;
+    opacity: 1;
+    transition: all 0.5s ease;
+    z-index: 999;
+    position: fixed;
+    height: calc(100vh - 80px);
+    width: 100%;
+    top: 154px; /* Account for top bar + navbar height */
+    overflow-y: auto;
+    padding-bottom: 50px;
+  }
+  
+  .navbar.scrolled .nav-menu.active {
+    top: 80px; /* When navbar is scrolled */
+  }
+  
+  /* Style mobile dropdown better */
+  .dropdown-menu.show {
+    max-height: 300px;
+    padding: 10px 0;
+    margin: 10px auto;
+    width: 80%;
+    border-radius: 5px;
+  }
+}
+
+/* Mega Menu Styles */
+.mega-dropdown {
+  position: static !important;
+}
+
+.mega-menu {
+  position: absolute;
+  left: 0;
+  width: 100vw;
+  padding: 20px 0;
+  background-color: #fff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  display: none;
+  top: 100%;
+  transition: all 0.3s ease;
+}
+
+.mega-menu.show {
+  display: block;
+}
+
+.nav-item.mega-dropdown:hover .mega-menu,
+.nav-item.mega-dropdown:focus-within .mega-menu {
+  display: block;
+}
+
+.mega-menu-container {
+  display: flex;
+  justify-content: space-around;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.mega-menu-column {
+  flex: 1;
+  padding: 0 15px;
+}
+
+.mega-menu-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #003366;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eee;
+}
+
+.mega-menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mega-menu-item {
+  display: block;
+  padding: 8px 0;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.mega-menu-item:hover {
+  color: #ff9800 !important;
+  background: none !important;
+}
+
+.mega-menu-item:hover:before {
+  content: "→";
+  position: absolute;
+  left: -15px;
+  color: #1a73e8;
+}
+
+/* Mobile Mega Menu Styles */
+@media screen and (max-width: 960px) {
+  .mega-menu {
+    position: static;
+    background-color: rgba(0, 0, 0, 0.1);
+    box-shadow: none;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+    width: 100%;
+  }
+  
+  .nav-item.mega-dropdown:hover .mega-menu {
+    display: none; /* Disable hover on mobile */
+  }
+  
+  .mega-menu.show {
+    max-height: 2000px;
+    padding: 10px 0;
+    display: block;
+  }
+  
+  .mega-menu-container {
+    flex-direction: column;
+    padding: 0;
+  }
+  
+  .mega-menu-column {
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .mega-menu-title {
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .mega-menu-item {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+  
+  .mega-menu-item:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding-left: 20px;
+  }
+  
+  .mega-menu-item:hover:before {
+    display: none;
+  }
+}
+
+.top-bar .contact-link span {
+  color: #004e6e !important;
+  font-weight: 600;
+}
+
+.top-bar .contact-link i {
+  color: #004e6e !important;
+} 

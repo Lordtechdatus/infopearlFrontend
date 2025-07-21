@@ -1,0 +1,240 @@
+/* Styles for ManageSalary Component */
+
+/* Styling for the Create New Salary Slip button */
+.create-slip-btn {
+  background: linear-gradient(135deg, #051937, #004d7a);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+  padding: 10px 20px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.create-slip-btn:hover {
+  background: linear-gradient(135deg, #004d7a, #051937);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.create-slip-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.create-slip-btn i {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+/* Styling for table headers */
+.table thead th {
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: 600;
+  border-bottom: 2px solid #dee2e6;
+  padding: 12px 8px;
+}
+
+.table thead th:hover {
+  background-color: #e9ecef;
+  cursor: pointer;
+}
+
+/* Styling for action buttons */
+.action-btn {
+  padding: 6px 10px;
+  margin: 0 3px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.download-btn {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.email-btn {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+/* Styling for summary cards */
+.summary-card {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card .card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.summary-card h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.summary-card .icon-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.summary-card .icon-container i {
+  font-size: 1.5rem;
+  color: white;
+}
+
+/* Styling for the search box */
+.search-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-container .form-control {
+  padding-left: 40px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  background-color: #f8f9fa;
+  transition: all 0.3s ease;
+}
+
+.search-container .form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(5, 25, 55, 0.25);
+  border-color: #004d7a;
+  background-color: white;
+}
+
+.search-container i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+/* Pagination styling */
+.pagination {
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #051937;
+  border-color: #051937;
+}
+
+.pagination .page-link {
+  color: #051937;
+  border: 1px solid #dee2e6;
+  margin: 0 2px;
+}
+
+.pagination .page-link:hover {
+  background-color: #f8f9fa;
+  color: #004d7a;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .summary-card h2 {
+    font-size: 1.8rem;
+  }
+  
+  .table-responsive {
+    border: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .create-slip-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .action-btn {
+    padding: 4px 8px;
+    margin: 2px;
+  }
+}
+
+/* No Records Found container styling */
+.no-records-container {
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.no-records-container i {
+  color: #adb5bd;
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.no-records-container h5 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.no-records-container p {
+  color: #6c757d;
+  margin-bottom: 20px;
+  max-width: 80%;
+  text-align: center;
+}
+
+.create-first-slip-btn {
+  background-color: transparent;
+  border: 2px solid #051937;
+  color: #051937;
+  font-weight: 500;
+  padding: 8px 20px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.create-first-slip-btn:hover {
+  background: linear-gradient(135deg, #051937, #004d7a);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+} 

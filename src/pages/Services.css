@@ -1,0 +1,163 @@
+/* Services Overview */
+.services-overview {
+  padding: 4rem 0 2rem;
+}
+
+/* Services Detail */
+.services-detail {
+  padding: 2rem 0 6rem;
+}
+
+.service-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  margin-bottom: 6rem;
+}
+
+.service-item.reverse {
+  grid-template-columns: 1fr 1fr;
+  direction: rtl;
+}
+
+.service-content {
+  direction: ltr;
+}
+
+.service-item h3 {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.service-item h3::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--secondary-color);
+}
+
+.service-item p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.service-features {
+  padding-left: 1.5rem;
+}
+
+.service-features li {
+  margin-bottom: 1rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.service-features li::before {
+  content: "•";
+  color: var(--secondary-color);
+  font-weight: bold;
+  display: inline-block;
+  width: 1.5rem;
+  margin-left: -1.5rem;
+}
+
+.service-image {
+  height: 100%;
+  width: 100%;
+}
+
+.image-placeholder {
+  border-radius: 10px;
+  overflow: hidden;
+  height: 350px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.service-img-1 {
+  background: linear-gradient(135deg, rgba(0, 51, 78, 0.9) 0%, rgba(0, 85, 128, 0.9) 100%);
+}
+
+.service-img-2 {
+  width: 100%;
+  height: 300px; /* adjust height as needed */
+  background-image: url('../assets/training.png.jpg'); /* fixed path to use existing asset */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.service-img-3 {
+  width: 100%;
+  height: 300px; /* adjust height as needed */
+  background-image: url('../assets/phd-guidance.png'); /* updated to use existing asset */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.service-img-4 {
+  width: 100%;
+  height: 300px; /* adjust height as needed */
+  background-image: url('../assets/mmmm.png'); /* updated to use existing asset */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.service-img-5 {
+  width: 100%;
+  height: 300px; /* adjust height as needed */
+  background-image: url('../assets/it.png'); /* updated to use existing asset */
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+@media screen and (max-width: 992px) {
+  .service-item,
+  .service-item.reverse {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    margin-bottom: 5rem;
+    direction: ltr;
+  }
+
+  .service-image {
+    order: -1;
+  }
+
+  .image-placeholder {
+    height: 300px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .services-overview {
+    padding: 3rem 0 1rem;
+  }
+
+  .services-detail {
+    padding: 1rem 0 4rem;
+  }
+
+  .service-item {
+    margin-bottom: 4rem;
+  }
+
+  .service-item h3 {
+    font-size: 1.8rem;
+  }
+
+  .service-item p {
+    font-size: 1rem;
+  }
+}

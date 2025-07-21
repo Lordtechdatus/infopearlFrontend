@@ -1,0 +1,107 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Full viewport height */
+  /* background-color: #f4f7f6; */ /* Old color */
+  background: linear-gradient(to bottom right, #eef2f3, #e0e8f0); /* Subtle gradient background */
+}
+
+.login-form {
+  background: white;
+  padding: 40px 50px; /* Increase horizontal padding */
+  border-radius: 10px; /* Slightly more rounded corners */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Softer shadow */
+  width: 100%;
+  max-width: 420px; /* Slightly wider */
+  text-align: center;
+}
+
+/* Logo Styling */
+.login-logo {
+  margin-bottom: 20px;
+}
+
+.login-logo img {
+  max-height: 60px; /* Adjust size as needed */
+  width: auto;
+}
+
+.login-form h2 {
+  margin-bottom: 30px; /* More space below title */
+  color: #333;
+  font-weight: 600; /* Slightly bolder */
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Include padding and border in element's total width and height */
+  transition: border-color 0.2s ease; /* Add transition for focus */
+}
+
+/* Style for input focus */
+.form-group input:focus {
+  border-color: #007bff;
+  outline: none; /* Remove default outline */
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff; /* Primary button color */
+  color: white;
+  border: none;
+  border-radius: 5px; /* Match form border-radius slightly */
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2); /* Subtle shadow related to button color */
+}
+
+.login-button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
+.login-button:active { /* Add slight press effect */
+  transform: scale(0.99);
+}
+
+.error-message {
+  color: #dc3545; /* Red color for errors */
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+/* Back to Website Link */
+.back-link-container {
+  margin-top: 20px; /* Add space above the link */
+  text-align: center;
+}
+
+.back-link {
+  color: #6c757d; /* Subdued color */
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: #007bff; /* Highlight color on hover */
+  text-decoration: underline;
+} 

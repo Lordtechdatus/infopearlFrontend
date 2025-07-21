@@ -1,0 +1,148 @@
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Login page styles */
+.vertical-offset-100 {
+  margin-top: 100px;
+}
+
+.login-panel {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.panel-login {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.input-group-text {
+  background-color: #e9ecef;
+}
+
+/* Dashboard styles */
+.dashboard-card {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card .icon {
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover .icon {
+  transform: scale(1.1);
+}
+
+/* Table styles */
+.table-actions .btn {
+  margin-right: 5px;
+}
+
+/* Form styles */
+.required-field::after {
+  content: '*';
+  color: red;
+  margin-left: 4px;
+}
+
+/* Footer styles */
+footer {
+  margin-top: auto;
+}
+
+/* Add these styles for the sidebar with collapsible menu */
+.sidebar {
+  min-width: 200px;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  padding-top: 20px;
+  z-index: 100;
+}
+
+.sidebar .nav-link {
+  padding: 10px 15px;
+  border-radius: 0;
+  transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Make the submenu look more nested */
+.sidebar .nav-link.ms-3 {
+  padding-left: 1.5rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar .nav-link.ms-3:hover {
+  border-left: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.sidebar .nav-link.ms-3.active {
+  border-left: 2px solid rgba(255, 255, 255, 1);
+}
+
+.sidebar .bi {
+  font-size: 1.1rem;
+}
+
+/* Button hover effects */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

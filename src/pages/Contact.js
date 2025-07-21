@@ -1,0 +1,245 @@
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { contactImageBase64 } from '../assets';
+import './Contact.css';
+
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 1 } }
+};
+
+const slideUp = {
+  hidden: { y: 50, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.6 } }
+};
+
+const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // In a real application, you would send this data to a backend service
+    console.log('Form submitted:', formData);
+    // Show success message
+    setSubmitted(true);
+    // Reset form after submission
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: ''
+    });
+    // Reset success message after 5 seconds
+    setTimeout(() => {
+      setSubmitted(false);
+    }, 5000);
+  };
+
+  return (
+    <div className="page-content">
+      {/* Page Header */}
+      <section className="page-header">
+        <div className="contact-image-container">
+          <img src={contactImageBase64} alt="IT Solutions Contact" className="contact-image" />
+        </div>
+        <div className="container">
+          <motion.h1
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            Contact Us
+          </motion.h1>
+          <motion.div
+            className="breadcrumb"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <span>Home</span> / <span className="active">Contact</span>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="contact-section">
+        <div className="container">
+          <div className="contact-wrapper">
+            <motion.div
+              className="contact-info"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeIn}
+            >
+              <h2>Get In Touch</h2>
+              <p>
+                Have questions about our services? Ready to start your research journey with us?
+                Contact us today and our team will get back to you as soon as possible.
+              </p>
+              
+              <div className="contact-details">
+                <div className="contact-item">
+                  <i className="fas fa-map-marker-alt"></i>
+                  <div>
+                    <h4>Our Location</h4>
+                    <p>
+                    G1, Akansha Apartment, Patel Nagar, City Centre, Gwalior, Near Raj Rajeshwari Apartment-474002</p>
+                  </div>
+                </div>
+                
+                <div className="contact-item">
+                  <i className="fas fa-envelope"></i>
+                  <div>
+                    <h4>Email Us</h4>
+                    <p>infopearl396@gmail.com</p>
+                    <p>ceo@infopearl.in</p>
+                  </div>
+                </div>
+                
+                <div className="contact-item">
+                  <i className="fas fa-phone-alt"></i>
+                  <div>
+                    <h4>Call Us</h4>
+                    <p>7000937390</p>
+                  </div>
+                </div>
+                
+                <div className="contact-item">
+                  <i className="fas fa-globe"></i>
+                  <div>
+                    <h4>Website</h4>
+                    <p>www.infopearl.in</p>
+                  </div>
+                </div>
+              </div>
+
+            </motion.div>
+            
+            <motion.div
+              className="contact-form-container"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={slideUp}
+            >
+              <h2>Send Us a Message</h2>
+              {submitted ? (
+                <div className="success-message">
+                  <p>Thank you for your message! We'll get back to you soon.</p>
+                </div>
+              ) : (
+                <form className="contact-form" onSubmit={handleSubmit}>
+                  <div className="form-group">
+                    <label htmlFor="name">Your Name</label>
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="email">Your Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="phone">Phone Number</label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="subject">Subject</label>
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="message">Your Message</label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows="5"
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                    ></textarea>
+                  </div>
+                  
+                  <button type="submit" className="btn btn-primary">Send Message</button>
+                </form>
+              )}
+            </motion.div>
+          </div>
+
+          {/* --- Map Section (New Position) --- */}
+          <motion.div 
+            className="map-container full-width-map" 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }} // Trigger animation when 20% is visible
+            variants={fadeIn} // Use fadeIn animation
+          >
+            <h3>Our Location on Map</h3>
+            {/* --- PASTE YOUR GOOGLE MAPS IFRAME CODE HERE --- */}
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3578.959192638861!2d78.18319167516298!3d26.23044817706139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3976c4188a5e0a9b%3A0x98089e9035708828!2sAkansha%20Apartment!5e0!3m2!1sen!2sin!4v1718280307594!5m2!1sen!2sin" 
+              width="100%" 
+              height="400" /* Increased height */
+              style={{ border:0 }} 
+              allowFullScreen="" 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+              title="InfoPearl Location Map"
+            >
+            </iframe>
+             {/* --- END OF IFRAME --- */}
+          </motion.div>
+
+        </div> {/* End of container */}
+      </section>
+    </div>
+  );
+};
+
+export default Contact; 

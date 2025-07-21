@@ -1,0 +1,366 @@
+.admin-page {
+  padding: 20px;
+}
+
+.admin-card-description {
+  margin: 0 0 20px;
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+/* Menu Items List */
+.menu-items-list {
+  margin-bottom: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.menu-item {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.menu-item:hover {
+  background-color: #eef2f7;
+}
+
+.menu-item-content {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+}
+
+.menu-item-text {
+  flex: 2;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.menu-item-path {
+  flex: 2;
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.menu-item-actions {
+  display: flex;
+  align-items: center;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7f8c8d;
+  transition: color 0.2s ease;
+}
+
+.action-button.edit-button:hover {
+  color: #3498db;
+}
+
+.action-button.delete-button:hover {
+  color: #e74c3c;
+}
+
+.button-badge, .dropdown-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 3px;
+  margin-right: 8px;
+}
+
+.button-badge {
+  background-color: #3498db;
+  color: white;
+}
+
+.dropdown-badge {
+  background-color: #f39c12;
+  color: white;
+}
+
+/* Add Menu Item Form */
+.add-menu-item-form {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.add-menu-item-form h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.admin-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.admin-button.secondary-button {
+  background-color: #95a5a6;
+}
+
+.admin-button.secondary-button:hover {
+  background-color: #7f8c8d;
+}
+
+.admin-button.add-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-button.add-button svg {
+  font-size: 14px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Modal */
+.admin-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-modal-content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 25px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.admin-modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #2c3e50;
+}
+
+.admin-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+  justify-content: flex-end;
+}
+
+/* Dropdown Items Section */
+.dropdown-items-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.dropdown-items-section h3 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.dropdown-items-list {
+  margin-bottom: 15px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.dropdown-item-fields {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+}
+
+.dropdown-item-fields input {
+  flex: 1;
+}
+
+.admin-page-actions {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Homepage Sections */
+.homepage-sections-list {
+  margin-bottom: 30px;
+}
+
+.section-card {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.section-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.section-content {
+  margin-top: 10px;
+}
+
+.section-field {
+  margin-bottom: 10px;
+}
+
+.section-field-label {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-bottom: 3px;
+}
+
+.section-field-value {
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+/* Footer Settings */
+.social-media-list {
+  margin-bottom: 20px;
+}
+
+.social-media-item {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.social-icon-preview {
+  width: 30px;
+  height: 30px;
+  background-color: #3498db;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+.social-media-fields {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+}
+
+.social-media-fields select,
+.social-media-fields input {
+  flex: 1;
+}
+
+.quick-links-section,
+.services-links-section {
+  margin-top: 25px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .menu-item-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .menu-item-text,
+  .menu-item-path {
+    margin-bottom: 5px;
+  }
+  
+  .menu-item-actions {
+    align-self: flex-end;
+  }
+  
+  .dropdown-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .dropdown-item-fields {
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .social-media-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .social-icon-preview {
+    margin-bottom: 10px;
+  }
+  
+  .social-media-fields {
+    flex-direction: column;
+    width: 100%;
+  }
+} 

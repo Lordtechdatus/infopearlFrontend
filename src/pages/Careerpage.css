@@ -1,0 +1,68 @@
+/* src/pages/CareerPage.css */
+
+/* src/pages/CareerPage.css */
+.career-banner {
+  background: 
+    linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+    url('../assets/career-banner.jpg') center/cover no-repeat;
+  padding: 80px 0;
+  text-align: center;
+}
+
+
+  .career-banner h1 {
+    color: #fff;
+    font-size: 3rem;
+    margin: 0;
+  }
+  
+  .career-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+  .career-container h2 {
+    margin-bottom: 24px;
+    font-size: 1.8rem;
+    color: #333;
+  }
+  
+  .career-form .form-group {
+    margin-bottom: 20px;
+  }
+  .career-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #444;
+  }
+  .career-form input[type="text"],
+  .career-form input[type="email"],
+  .career-form select,
+  .career-form input[type="file"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .submit-btn {
+    background-color: #0066cc;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color .2s;
+  }
+  .submit-btn:hover {
+    background-color: #005bb5;
+  }
+  
+  @media (max-width: 600px) {
+    .career-banner h1 { font-size: 2.2rem; }
+    .career-container { padding: 0 12px; }
+  }
+  

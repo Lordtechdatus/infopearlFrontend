@@ -1,0 +1,177 @@
+/* Training Topics Page Styles */
+
+.topics-overview {
+  padding: 60px 0;
+  background-color: #f9f9f9;
+}
+
+.category-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 30px;
+  padding-bottom: 20px;
+}
+
+.category-btn {
+  padding: 12px 24px;
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+.category-btn.active {
+  background-color: #2c3e50;
+  color: #ffffff;
+  border-color: #2c3e50;
+}
+
+.topics-detail {
+  padding: 60px 0;
+}
+
+.active-category-info {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.active-category-info h2 {
+  color: #2c3e50;
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.active-category-info p {
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.topic-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  padding: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.topic-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.topic-card h3 {
+  color: #2c3e50;
+  font-size: 20px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.topic-description {
+  color: #666;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.topic-details {
+  margin: 20px 0;
+  padding: 15px 0;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.detail-item {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #333;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: #666;
+}
+
+.upcoming-sessions {
+  margin: 20px 0 0;
+  padding-top: 10px;
+  margin-top: auto;
+}
+
+.upcoming-sessions h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.upcoming-sessions ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.upcoming-sessions li {
+  background-color: #f0f4f8;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.topic-card .btn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.topic-card .btn:hover {
+  background-color: #2980b9;
+}
+
+@media (max-width: 768px) {
+  .topics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .category-nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .category-btn {
+    width: 100%;
+  }
+} 
