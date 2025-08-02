@@ -1,3 +1,4 @@
+//src/pages/contact.js
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { contactImageBase64 } from '../assets';
@@ -225,10 +226,10 @@ const Contact = () => {
             <h3>Our Location on Map</h3>
             {/* --- PASTE YOUR GOOGLE MAPS IFRAME CODE HERE --- */}
             <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3578.959192638861!2d78.18319167516298!3d26.23044817706139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3976c4188a5e0a9b%3A0x98089e9035708828!2sAkansha%20Apartment!5e0!3m2!1sen!2sin!4v1718280307594!5m2!1sen!2sin" 
-              width="100%" 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3579.595122320124!2d78.18758317451262!3d26.209845877073008!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3976c41cce3cd799%3A0x184f3cb9095a386c!2zQWthbnNoYSBBcGFydG1lbnQgKOCkhuCkleCkvuCkguCktuCkviDgpIXgpKrgpL7gpLDgpY3gpJ_gpK7gpYfgpILgpJ8p!5e0!3m2!1sen!2sin!4v1754120800883!5m2!1sen!2sin"
+              width="80%" 
               height="400" /* Increased height */
-              style={{ border:0 }} 
+              style={{ border: '1px solid gray' }} 
               allowFullScreen="" 
               loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"

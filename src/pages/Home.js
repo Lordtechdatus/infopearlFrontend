@@ -297,12 +297,13 @@ const Home = () => {
           </motion.p>
           
           <div className="services-grid">
-            <motion.div 
+            <motion.div
               className="service-card"
+              variants={slideUp}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
-              variants={slideUp}
+              viewport={{ once: true, amount: 0.3 }}
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
             >
               <div className="service-icon">
                 <i className="fas fa-book"></i>
@@ -316,6 +317,7 @@ const Home = () => {
               className="service-card"
               initial="hidden"
               whileInView="visible"
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
               viewport={{ once: true }}
               variants={slideUp}
             >
@@ -331,6 +333,7 @@ const Home = () => {
               className="service-card"
               initial="hidden"
               whileInView="visible"
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
               viewport={{ once: true }}
               variants={slideUp}
             >
@@ -346,6 +349,7 @@ const Home = () => {
               className="service-card"
               initial="hidden"
               whileInView="visible"
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
               viewport={{ once: true }}
               variants={slideUp}
             >
@@ -361,6 +365,7 @@ const Home = () => {
               className="service-card"
               initial="hidden"
               whileInView="visible"
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
               viewport={{ once: true }}
               variants={slideUp}
             >
@@ -376,6 +381,7 @@ const Home = () => {
               className="service-card"
               initial="hidden"
               whileInView="visible"
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
               viewport={{ once: true }}
               variants={slideUp}
             >
@@ -1253,6 +1259,7 @@ const Home = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
+                style={{ marginBottom: 3 }}
               >
                 KEEP IN TOUCH!
               </motion.h2>
@@ -1263,9 +1270,7 @@ const Home = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
-                INFOPEARL TECH SOLUTIONS provides PhD  research programand  IT SOLUTIONS. You can clarify all your
-                
-                doubts with our team. 
+                INFOPEARL TECH SOLUTIONS provides PhD  research program and IT SOLUTIONS. You can clarify all your doubts with our team.
                 
                 <a href="tel:+917000937390" className="phone-link">
                   <i className="fas fa-phone-alt"></i> +91 7000937390

@@ -856,7 +856,7 @@ const InvoiceList = () => {
             <div className="card bg-primary text-white" style={{ background: 'linear-gradient(135deg, #051937, #004d7a)', borderColor: '#051937' }}>
               <div className="card-body">
                 <h5 className="card-title">Total Amount</h5>
-                <h3 className="mb-0">₹{totals.totalAmount}</h3>
+                <h3 className="mb-0" style={{ color: 'black'}}>₹{totals.totalAmount}</h3>
               </div>
             </div>
           </Col>
@@ -864,7 +864,7 @@ const InvoiceList = () => {
             <div className="card bg-success text-white">
               <div className="card-body">
                 <h5 className="card-title">Received Amount</h5>
-                <h3 className="mb-0">₹{totals.totalReceived}</h3>
+                <h3 className="mb-0" style={{ color: 'black'}}>₹{totals.totalReceived}</h3>
               </div>
             </div>
           </Col>
@@ -872,7 +872,7 @@ const InvoiceList = () => {
             <div className="card bg-warning text-dark">
               <div className="card-body">
                 <h5 className="card-title">Pending Amount</h5>
-                <h3 className="mb-0">₹{totals.totalPending}</h3>
+                <h3 className="mb-0" style={{ color: 'black'}}>₹{totals.totalPending}</h3>
               </div>
             </div>
           </Col>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from 'react-bootstrap';
 
 // Default footer data (used if localStorage is empty)
 const defaultFooterData = {
   about: {
-    description: 'Innovations in Technology. We provide comprehensive support to PhD scholars and academic researchers with expert guidance in research, PhD admissions, conference organization, and data analysis.'
+    description: '' //'Innovations in Technology. We provide comprehensive support to PhD scholars and academic researchers with expert guidance in research, PhD admissions, conference organization, and data analysis.'
   },
   contact: {
     companyName: 'InfoPearl Tech Solutions Pvt. Ltd.',
@@ -39,7 +40,7 @@ const defaultFooterData = {
     showMobikwik: true,
     showPayapp: true
   },
-  copyright: '© 2023 InfoPearl Tech Solutions Pvt. Ltd. All Rights Reserved.'
+  copyright: `© ${new Date().getFullYear()} InfoPearl Tech Solutions Pvt. Ltd. All Rights Reserved.`
 };
 
 const FooterSettings = () => {
@@ -159,6 +160,13 @@ const FooterSettings = () => {
     }
   };
 
+  const resetToDefaults = () => {
+    if (window.confirm('Are you sure you want to reset all header settings to defaults?')) {
+      setFooterData(defaultFooterData);
+      setSuccessMessage('Settings reset to defaults. Click Save Changes to apply.');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsUpdating(true);
@@ -185,8 +193,24 @@ const FooterSettings = () => {
 
   return (
     <div className="content-management-container">
-      <h2>Footer Settings</h2>
-      <p>Update the information displayed in the website footer</p>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2>Footer Settings</h2>
+          <p>Update the information displayed in the website footer</p>
+        </div>
+
+        <div>
+            <Button 
+              variant="outline-secondary" 
+              size="sm"
+              onClick={resetToDefaults}
+              className="me-2"
+            >
+              <i className="bi bi-arrow-counterclockwise me-1"></i>
+              Reset to Defaults
+            </Button>
+          </div>
+      </div>
       
       {successMessage && (
         <div className="success-message">
@@ -204,7 +228,6 @@ const FooterSettings = () => {
               value={footerData.about.description}
               onChange={(e) => handleInputChange(e, 'about', 'description')}
               rows={4}
-              required
             />
           </div>
         </div>

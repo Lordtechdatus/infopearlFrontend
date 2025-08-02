@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { contactImageBase64 } from 'assets';
 import './Services.css';
 
 const fadeIn = {
@@ -29,6 +30,9 @@ const Services = () => {
     <div className="page-content">
       {/* Page Header */}
       <section className="page-header">
+        <div className="contact-image-container">
+          <img src={contactImageBase64} alt="IT Solutions Contact" className="contact-image" />
+        </div>
         <div className="container">
           <motion.h1
             initial={{ y: -20, opacity: 0 }}

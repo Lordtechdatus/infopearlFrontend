@@ -663,9 +663,6 @@
   border-radius: 50%;
 }
 
-
-
-
 .rectangle-element {
   position: absolute;
   width: 50px;
@@ -687,13 +684,13 @@
 }
 
 .keep-in-touch-content {
-  padding: 20px 30px;
+  padding: 20px 20px;
 }
 
 .keep-in-touch-content h2 {
   font-size: 2.0rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
   color: #1a1a1a;
   position: relative;
   text-transform: uppercase;
@@ -703,7 +700,7 @@
   font-size: 1.1rem;
   line-height: 1.8;
   color: #333;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .phone-link, .email-link {
@@ -2016,7 +2013,10 @@
 
 .service-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  border-top: 6px solid transparent;
+  border-radius: 10px;
+  border-image: linear-gradient(90deg, var(--primary-color), var(--accent-color)) 1;
 }
 
 .service-icon {
