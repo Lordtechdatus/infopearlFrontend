@@ -10,7 +10,7 @@ const WhatsAppButton = () => {
     <a
       href={url}
       target="_blank"
-      rel="noopener noreferrer"
+      rel="no-opener no-referrer"
       className="whatsapp-button"
       aria-label="Chat on WhatsApp"
     >

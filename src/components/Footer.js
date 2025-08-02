@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import LogoImage from '../assets/logo1.png';
+import facebook from '../assets/facebook.png';
+import instagram from '../assets/insta.png';
+import linkedin from '../assets/linkedin.png';
 import './Footer.css';
 import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
 
@@ -67,11 +70,11 @@ const Footer = () => {
         {/* About & Contact Section */}
         <div className="footer-section about">
           <div className="footer-logo">
-            <img
-              src={LogoImage}
-              alt="InfoPearl Tech Logo"
-              style={{ height: '70px', width: '70px', objectFit: 'contain' }}
-            />
+          <img
+            src={footerData.contact.logoUrl || LogoImage}
+            alt={LogoImage}
+            style={{ height: '70px', width: '70px', objectFit: 'contain' }}
+          />
             <h2>InfoPearl Tech</h2>
           </div>
           <p>{footerData.about.description}</p>
@@ -91,21 +94,21 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FaFacebookF size={28} />
+                <img src={facebook} alt='Facebook icon' style={{ height: '30px' }}/>
               </a>
               <a
                 href="https://www.instagram.com/infopearltech"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FaInstagram size={28} />
+                <img src={instagram} alt='Instagram icon' style={{ height: '30px' }}/>
               </a>
               <a
                 href="https://www.linkedin.com/company/infopearltech"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <FaLinkedinIn size={28} />
+                <img src={linkedin} alt='Linkedin icon' style={{ height: '30px' }}/>
               </a>
             </div>
           </div>

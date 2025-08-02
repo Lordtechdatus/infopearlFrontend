@@ -32,43 +32,37 @@ const LogoSettings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
     if (!previewLogo) {
       alert('Please select a logo to upload');
       return;
     }
-    
+  
     setIsUploading(true);
-    
+  
     try {
-      // Simulate API call to update logo
-      // In a real application, replace with actual API call
-      // const formData = new FormData();
-      // formData.append('logo', fileInputRef.current.files[0]);
-      
-      // await fetch('/api/settings/logo', {
-      //   method: 'POST',
-      //   body: formData,
-      // });
-      
-      // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update current logo with the preview
+  
       setCurrentLogo(previewLogo);
+  
+      // 🔁 Save to localStorage
+      const savedFooterData = localStorage.getItem('footerData');
+      const footerData = savedFooterData ? JSON.parse(savedFooterData) : {};
+      const updatedFooterData = {
+        ...footerData,
+        contact: {
+          ...footerData.contact,
+          logoUrl: previewLogo
+        }
+      };
+      localStorage.setItem('footerData', JSON.stringify(updatedFooterData));
+  
+      // Clear preview
       setPreviewLogo(null);
-      
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      
+      if (fileInputRef.current) fileInputRef.current.value = '';
+  
       setSuccessMessage('Logo updated successfully!');
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
+      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Error uploading logo:', error);
       alert('Error uploading logo. Please try again.');
@@ -76,6 +70,7 @@ const LogoSettings = () => {
       setIsUploading(false);
     }
   };
+  
 
   const handleCancel = () => {
     setPreviewLogo(null);
@@ -133,6 +128,7 @@ const LogoSettings = () => {
                   type="submit" 
                   className="save-btn" 
                   disabled={isUploading}
+                  onClick={handleSubmit}
                 >
                   {isUploading ? 'Uploading...' : 'Save Changes'}
                 </button>

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { heroBg, heroImageBase64 } from '../assets';
 import { fallbackImageUrl } from '../assets/images/features-image';
 import './Home.css';
-import TeamImage from '../assets/mmmm.jpg';
+// import TeamImage from '../assets/mmmm.jpg';
 import FeatureImage from '../assets/whychoose.png';
 import WhyChooseUsBg from '../assets/why.jpg';
 import IsoBanner from '../assets/iso-banner.jpg';
@@ -45,6 +45,28 @@ const Home = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState({ src: '', alt: '' });
   const [galleryImages, setGalleryImages] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0); // Track current image index
+
+  const allGalleryImages = galleryImages.length > 0 ? galleryImages : [
+    { src: require('../assets/mmmm.jpg'), alt: 'Research Team' },
+    { src: require('../assets/training.png.jpg'), alt: 'Training Session' },
+    { src: require('../assets/phd-guidance.png'), alt: 'PhD Guidance' },
+    { src: require('../assets/whychoose.png'), alt: 'Research Services' },
+    { src: require('../assets/opop.jpg'), alt: 'Office Space' },
+    { src: require('../assets/why.jpg'), alt: 'Work Environment' },
+    { src: require('../assets/phd.png'), alt: 'PhD Research' },
+    { src: require('../assets/it.png'), alt: 'IT Solutions' },
+    { src: require('../assets/data.png'), alt: 'Data Analysis' },
+    { src: require('../assets/b1.webp'), alt: 'Academic Support' },
+    { src: require('../assets/b2.webp'), alt: 'Consultations' },
+    { src: require('../assets/b3.webp'), alt: 'Research Documentation' },
+    { src: require('../assets/b4.webp'), alt: 'Workshop Session' },
+    { src: require('../assets/b5.webp'), alt: 'Team Collaboration' },
+    { src: require('../assets/t1.png'), alt: 'Technical Support' },
+    { src: require('../assets/t2.png'), alt: 'Conference Presentation' },
+    { src: require('../assets/t3.png'), alt: 'Academic Conference' },
+    { src: require('../assets/t4.jpg'), alt: 'Research Project' },
+  ];
 
   useEffect(() => {
     // Load gallery images from localStorage
@@ -113,12 +135,31 @@ const Home = () => {
   const featuresImgSrc = featuresImgError ? fallbackImageUrl : FeatureImage;
 
   // Function to open lightbox with the clicked image
+  // const openLightbox = (src, alt) => {
+  //   setCurrentImage({ src, alt });
+  //   setLightboxOpen(true);
+  //   // Prevent scrolling when lightbox is open
+  //   document.body.style.overflow = 'hidden';
+  // };
+
   const openLightbox = (src, alt) => {
+    const index = allGalleryImages.findIndex(img => img.src === src);
     setCurrentImage({ src, alt });
+    setCurrentIndex(index);
     setLightboxOpen(true);
-    // Prevent scrolling when lightbox is open
-    document.body.style.overflow = 'hidden';
   };
+
+  const handleNext = () => {
+    const nextIndex = (currentIndex + 1) % allGalleryImages.length;
+    setCurrentIndex(nextIndex);
+    setCurrentImage(allGalleryImages[nextIndex]);
+  };
+  
+  const handlePrev = () => {
+    const prevIndex = (currentIndex - 1 + allGalleryImages.length) % allGalleryImages.length;
+    setCurrentIndex(prevIndex);
+    setCurrentImage(allGalleryImages[prevIndex]);
+  };  
 
   // Function to close lightbox
   const closeLightbox = () => {
@@ -141,7 +182,7 @@ const Home = () => {
         background: heroBg, 
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        height: '60vh'
+        height: '85vh'
       }}>
         <div className="hero-image-container">
           <img src={heroImageBase64} alt="InfoPearl Tech Solutions - IT and Academic Research Services" className="hero-image" />
@@ -151,6 +192,7 @@ const Home = () => {
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
+            // style={{ color: 'rgba(0, 0, 0, 0.80)' }}
           >
             InfoPearl Tech Solutions
           </motion.h1>
@@ -158,6 +200,7 @@ const Home = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
+            // style={{ color: 'black' }}
           >
             Empowering Scholars, Advancing Research
           </motion.p>
@@ -204,13 +247,10 @@ const Home = () => {
               variants={slideRight}
             >
               <p>
-                InfoPearl Tech Solutions Pvt. Ltd. is a leading company dedicated to providing comprehensive 
-                support to PhD scholars and academic researchers as well as It solutions(web design,web development,software development,data analysis,etc). Our primary focus is to offer expert guidance in 
-                research, PhD admissions, conference organization, and data analysis, technical training & internships, simulation work and training.
+                InfoPearl Tech Solutions Pvt. Ltd. is a leading company dedicated to providing comprehensive support to PhD scholars and academic researchers as well as It solutions ( Web design, Web development, Software development, Data analysis and etc ). Our primary focus is to offer expert guidance in research, PhD admissions, conference organization, and data analysis, technical training & internships, simulation work and training.
               </p>
               <p>
-                Founded with the vision of bridging the gap between academia and industry, we are committed to 
-                empowering scholars to achieve academic excellence and advance their research careers.
+                Founded with the vision of bridging the gap between academia and industry, we are committed to empowering scholars to achieve academic excellence and advance their research careers.
               </p>
               <div className="about-cta">
                 
@@ -225,7 +265,7 @@ const Home = () => {
               variants={slideLeft}
             >
               <img 
-                src={require('../assets/about.png')} 
+                src={require('../assets/img.png')} 
                 alt="About InfoPearl Tech" 
                 className="about-img"
               />
@@ -582,6 +622,7 @@ const Home = () => {
             <motion.h2 
               className="section-title text-center"
               variants={fadeIn}
+              style={{ marginTop: '30px' }}
             >
               SUBJECT AREAS WE SERVED!
             </motion.h2>
@@ -782,7 +823,7 @@ const Home = () => {
           >
             <b>Showcasing our achievements and activities</b>
             
-            <b>(coming soon....)</b>
+            <b> ( coming soon... ) </b>
           </motion.p>
           
           <div className="gallery-container">
@@ -1158,13 +1199,19 @@ const Home = () => {
               transition={{ type: "spring", damping: 15 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="lightbox-header">
-                <h3>{currentImage.alt}</h3>
+              {/* <div className="lightbox-header">
                 <button className="lightbox-close" onClick={closeLightbox}>×</button>
-              </div>
+              </div> */}
               <div className="lightbox-image-container">
+                <button className="lightbox-close-hover" onClick={closeLightbox}>×</button>
                 <img src={currentImage.src} alt={currentImage.alt} />
               </div>
+              <button className="lightbox-nav-button lightbox-prev" onClick={handlePrev}>
+                ‹
+              </button>
+              <button className="lightbox-nav-button lightbox-next" onClick={handleNext}>
+                ›
+              </button>
             </motion.div>
           </motion.div>
         )}

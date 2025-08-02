@@ -80,7 +80,7 @@
 }
 
 .contact-details {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .contact-item {
@@ -142,7 +142,8 @@
   background-color: white;
   padding: 2.5rem;
   border-radius: 10px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+  border: 10px solid transparent;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
 }
 
 .contact-form-container h2 {

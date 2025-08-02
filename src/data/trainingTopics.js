@@ -10,16 +10,16 @@ const trainingTopics = {
         
         level: "Intermediate",
         targetAudience: "PhD Scholars, Researchers,masters",
-        upcomingSessions: ["jan"]
+        upcomingSessions: ["Jan"]
       },
       {
         id: 102,
         title: "IT SOLUTIONS",
-        description: "Master web development,mobile development,app development,social media marketing,SEO and marketing",
+        description: "Master web development, mobile development, app development, social media marketing, SEO and marketing",
       
         level: "Intermediate",
         targetAudience: "undergraduate,masters.",
-        upcomingSessions: ["jan"]
+        upcomingSessions: ["Jan"]
       },
       {
         id: 103,
@@ -27,7 +27,7 @@ const trainingTopics = {
         description: "Learn to combine quantitative and qualitative methods for comprehensive research outcomes",
       
         level: "Advanced",
-        targetAudience: "Experienced Researchers, Faculty,masters,phd",
+        targetAudience: "Experienced Researchers, Faculty, masters, phd",
         upcomingSessions: ["Jan "]
       }
     ]

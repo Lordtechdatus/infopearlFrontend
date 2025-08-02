@@ -241,14 +241,14 @@ const Navbar = () => {
       {navData.showContactInfo && (
         <div className="top-bar" style={{ 
           backgroundColor: navData.topBarBackgroundColor,
-          color: navData.topBarTextColor 
+          color: navData.topBarTextColor,
         }}>
           <div className="container">
             <div className="top-bar-content">
               <div className="contact-info">
-                <a href={`mailto:${navData.email}`} className="contact-link" style={{ color: navData.topBarTextColor }}>
-                  <i className="fas fa-envelope"></i>
-                  <span>{navData.email}</span>
+                <a href={`mailto:${navData.email}`} className="contact-link">
+                  <i className="fas fa-envelope" style={{ color: navData.topBarTextColor }}></i>
+                  <span style={{ color: navData.topBarTextColor }}>{navData.email}</span>
                 </a>
                 <a href={`tel:${navData.phone}`} className="contact-link" style={{ color: navData.topBarTextColor }}>
                   <img 
@@ -256,7 +256,7 @@ const Navbar = () => {
                     alt="Indian Flag" 
                     className="phone-flag" 
                   />
-                  <span>{navData.phone}</span>
+                  <span style={{ color: navData.topBarTextColor }}>{navData.phone}</span>
                 </a>
               </div>
             </div>
@@ -266,7 +266,8 @@ const Navbar = () => {
 
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} style={{ 
         backgroundColor: navData.navbarBackgroundColor,
-        color: navData.navbarTextColor 
+        color: navData.navbarTextColor,
+        position: 'sticky' 
       }}>
         <div className="navbar-container">
           <Link to="/" className="navbar-logo" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: '0', marginRight: '0' }}>
@@ -277,7 +278,7 @@ const Navbar = () => {
               style={{
                 height: `${navData.logoSize}px`,
                 width: `${navData.logoSize}px`,
-                objectFit: 'contain'
+                objectFit: 'contain',
               }}
             />
             <span className="logo-text" style={{ fontWeight: 'bold', fontSize: '30px', color: navData.navbarTextColor }}>

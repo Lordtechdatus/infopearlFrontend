@@ -132,7 +132,9 @@ const Contact = () => {
               </div>
 
             </motion.div>
-            
+
+
+            {/* Form Details Section*/}
             <motion.div
               className="contact-form-container"
               initial="hidden"

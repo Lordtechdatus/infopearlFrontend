@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
-import StickyMessage from './components/StickyMessage';  // <-- Imported StickyMessage
+// import StickyMessage from './components/StickyMessage';  // <-- Imported StickyMessage
 
 // Pages
 import Home from './pages/Home';
@@ -156,7 +156,7 @@ function App() {
         </Routes>
 
         {/* Sticky running message at bottom */}
-        <StickyMessage message="🚀 Welcome! . We are hiring INTERNS for various positions. Apply now!" />
+        {/* <StickyMessage message="🚀 Welcome! . We are hiring INTERNS for various positions. Apply now!" /> */}
       </div>
     </Router>
   );
