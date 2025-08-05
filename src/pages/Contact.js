@@ -24,6 +24,8 @@ const Contact = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,24 +35,45 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real application, you would send this data to a backend service
-    console.log('Form submitted:', formData);
-    // Show success message
-    setSubmitted(true);
-    // Reset form after submission
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: ''
-    });
-    // Reset success message after 5 seconds
-    setTimeout(() => {
-      setSubmitted(false);
-    }, 5000);
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/backend/api/contact/submit.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Show success message
+        setSubmitted(true);
+        // Reset form after submission
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        });
+        // Reset success message after 5 seconds
+        setTimeout(() => {
+          setSubmitted(false);
+        }, 5000);
+      } else {
+        setError(result.message || 'Failed to submit form. Please try again.');
+      }
+    } catch (error) {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -150,6 +173,12 @@ const Contact = () => {
                 </div>
               ) : (
                 <form className="contact-form" onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="error-message">
+                      <p>{error}</p>
+                    </div>
+                  )}
+                  
                   <div className="form-group">
                     <label htmlFor="name">Your Name</label>
                     <input
@@ -159,6 +188,7 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                   </div>
                   
@@ -171,6 +201,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                   </div>
                   
@@ -182,6 +213,7 @@ const Contact = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
+                      disabled={loading}
                     />
                   </div>
                   
@@ -194,6 +226,7 @@ const Contact = () => {
                       value={formData.subject}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     />
                   </div>
                   
@@ -206,10 +239,17 @@ const Contact = () => {
                       value={formData.message}
                       onChange={handleChange}
                       required
+                      disabled={loading}
                     ></textarea>
                   </div>
                   
-                  <button type="submit" className="btn btn-primary">Send Message</button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? 'Sending...' : 'Send Message'}
+                  </button>
                 </form>
               )}
             </motion.div>

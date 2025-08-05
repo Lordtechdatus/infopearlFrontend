@@ -1,4 +1,5 @@
 <?php
+require_once '../../includes/DatabaseClass.php';
 require_once '../../includes/Auth.php';
 require_once '../../includes/Response.php';
 

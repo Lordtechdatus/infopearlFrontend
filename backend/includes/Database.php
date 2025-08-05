@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once 'config/database.php';
 require_once 'config/cors.php';
-require_once 'includes/Database.php';
+require_once 'includes/DatabaseClass.php';
 require_once 'includes/Auth.php';
 require_once 'includes/Response.php';
 
@@ -39,7 +39,7 @@ try {
     $id = $segments[2] ?? null;
 
     // Define allowed resources
-    $allowed_resources = ['auth', 'customers', 'invoices', 'salary', 'users', 'content'];
+    $allowed_resources = ['auth', 'customers', 'invoices', 'salary', 'users', 'content', 'contact'];
 
     if (!in_array($resource, $allowed_resources)) {
         throw new Exception('Resource not found', 404);

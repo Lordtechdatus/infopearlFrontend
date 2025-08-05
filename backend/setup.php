@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/Database.php';
+require_once 'includes/DatabaseClass.php';
 
 echo "Setting up InfoPearl Backend...\n";
 

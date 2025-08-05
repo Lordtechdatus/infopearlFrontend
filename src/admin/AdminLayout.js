@@ -73,6 +73,11 @@ const AdminLayout = () => {
             <i className="fas fa-images"></i> Gallery
           </Nav.Link>
           
+          <div className="sidebar-section">Communication</div>
+          <Nav.Link as={Link} to="/admin/contact-messages" className={isActive('/admin/contact-messages') ? 'active' : ''}>
+            <i className="fas fa-envelope-open"></i> Contact Messages
+          </Nav.Link>
+          
           <div className="sidebar-section">Invoices Management</div>
           
           {/* Customers dropdown */}
