@@ -35,6 +35,7 @@ const About = () => {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}
+            style={{ color: 'white' }}
           >
             About Us
           </motion.h1>

@@ -21,7 +21,7 @@ if ($database->createTables()) {
     echo "Tables created successfully.\n";
     echo "Default admin user created:\n";
     echo "Username: admin\n";
-    echo "Password: info@123\n";
+    echo "Password: infopearl@123\n";
     echo "\nContact messages table created with the following structure:\n";
     echo "- id (SERIAL PRIMARY KEY)\n";
     echo "- name (VARCHAR(100))\n";

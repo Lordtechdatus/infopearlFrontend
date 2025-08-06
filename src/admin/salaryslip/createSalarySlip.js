@@ -642,10 +642,10 @@ const SalarySlip = () => {
         // Salary Slip Creation Form
         <>
           <div className="salary-slip-header mb-4" style={{ 
-            background: 'linear-gradient(135deg, #051937, #004d7a)',
+            background: 'white',
             padding: '25px',
             borderRadius: '0',
-            color: 'white',
+            color: '#004d7a',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
@@ -670,15 +670,14 @@ const SalarySlip = () => {
               </div>
               <div>
                 <h2 style={{ margin: '0', fontWeight: 'bold', fontSize: '24px' }}>Infopearl Tech Solutions Pvt Ltd</h2>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>G1 Akansha Apartment</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>Patel Nagar, City center</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>7000937390</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>infopearl396@gmail.com</p>
                 <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>www.infopearl.in</p>
               </div>
             </div>
-            <div>
-              <h1 style={{ fontSize: '48px', margin: '0', fontWeight: 'bold', color: '#ffffff' }}>SALARY SLIP</h1>
+            <div style={{ marginRight: '70px' }}>
+            <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>G1 Akansha Apartment</p>
+                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>Patel Nagar, City center</p>
+                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>7000937390</p>
+                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>infopearl396@gmail.com</p>
             </div>
           </div>
 
@@ -1143,8 +1142,8 @@ const SalarySlip = () => {
               display: 'flex', 
               justifyContent: 'space-between',
               alignItems: 'center',
-              background: 'linear-gradient(135deg, #051937, #004d7a)',
-              color: '#fff',
+              background: 'white',
+              color: '#004d7a',
               padding: '20px',
               marginBottom: '30px'
             }}>
@@ -1167,15 +1166,14 @@ const SalarySlip = () => {
                 </div>
                 <div>
                   <h2 style={{ margin: '0', fontWeight: 'bold', fontSize: '18px' }}>Infopearl Tech Solutions Pvt Ltd</h2>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>G1 Akansha Apartment</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>Patel Nagar, City center</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>7000937390</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>infopearl396@gmail.com</p>
                   <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>www.infopearl.in</p>
                 </div>
               </div>
-              <div>
-                <h1 style={{ fontSize: '32px', fontWeight: 'bold', margin: 0 }}>SALARY SLIP</h1>
+              <div style={{ marginRight: '50px' }}>
+              <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>G1 Akansha Apartment</p>
+                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>Patel Nagar, City center</p>
+                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>7000937390</p>
+                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>infopearl396@gmail.com</p>
               </div>
             </div>
 
@@ -1256,8 +1254,8 @@ const SalarySlip = () => {
                   border: '1px solid #ddd'
                 }}>
                   <thead>
-                    <tr style={{ background: 'linear-gradient(135deg, #051937, #004d7a)', color: '#fff' }}>
-                      <th colSpan="2" style={{ padding: '10px', textAlign: 'center' }}>EARNINGS</th>
+                    <tr style={{ background: 'white', color: '#051937' }}>
+                      <th colSpan="2" style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #051937' }}>EARNINGS</th>
                     </tr>
                     <tr style={{ backgroundColor: '#f8f9fa' }}>
                       <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Description</th>
@@ -1291,8 +1289,8 @@ const SalarySlip = () => {
                   border: '1px solid #ddd'
                 }}>
                   <thead>
-                    <tr style={{ background: 'linear-gradient(135deg, #051937, #004d7a)', color: '#fff' }}>
-                      <th colSpan="2" style={{ padding: '10px', textAlign: 'center' }}>DEDUCTIONS</th>
+                    <tr style={{ background: 'white', color: '#051937' }}>
+                      <th colSpan="2" style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #051937' }}>DEDUCTIONS</th>
                     </tr>
                     <tr style={{ backgroundColor: '#f8f9fa' }}>
                       <th style={{ padding: '8px', textAlign: 'left', borderBottom: '1px solid #ddd' }}>Description</th>
@@ -1323,14 +1321,15 @@ const SalarySlip = () => {
             <div style={{ 
               width: '50%', 
               margin: '0 auto 30px auto',
-              background: 'linear-gradient(135deg, #051937, #004d7a)',
-              color: 'white',
+              background: 'white',
+              color: '#051937',
               padding: '15px',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               fontWeight: 'bold',
               fontSize: '18px',
+              border: '1px solid #051937',
               borderRadius: '4px'
             }}>
               <span>NET SALARY</span>

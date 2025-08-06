@@ -19,7 +19,7 @@ if ($database->createTables()) {
     echo "Tables created successfully.\n";
     echo "Default admin user created:\n";
     echo "Username: admin\n";
-    echo "Password: info@123\n";
+    echo "Password: infopearl@123\n";
 } else {
     echo "Error creating tables.\n";
     exit(1);

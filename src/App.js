@@ -136,6 +136,9 @@ import UserList from './admin/users/UserList';
 import UserAdd from './admin/users/UserAdd';
 import LogoSettings from './admin/ContentManagement/LogoSettings';
 import ContactMessages from './admin/ContactMessages';
+import LetterList from './admin/letters/LetterList';
+import LetterCreate from './admin/letters/LetterCreate';
+import LetterDownload from './admin/letters/LetterDownload';
 
 // Helper Components
 import ProtectedRoute from './components/ProtectedRoute';
@@ -143,9 +146,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 const PopupModal = ({ onClose }) => (
   <div className="popup-overlay">
     <div className="popup-content">
+    <button onClick={onClose} className="close-btn">
+      <i className="fas fa-times"></i>
+    </button>
       <h2>Welcome to InfoPearl!</h2>
       <p>Explore our career opportunities and get in touch with us.</p>
-      <button onClick={onClose} className="close-btn">Close</button>
     </div>
   </div>
 );
@@ -217,6 +222,9 @@ function App() {
               <Route path="salary/slip" element={<SalarySlip />} />
               <Route path="users" element={<UserList />} />
               <Route path="users/add" element={<UserAdd />} />
+              <Route path="letters" element={<LetterList />} />
+              <Route path="letters/create" element={<LetterCreate />} />
+              <Route path="letters/download" element={<LetterDownload />} />
             </Route>
           </Routes>
 

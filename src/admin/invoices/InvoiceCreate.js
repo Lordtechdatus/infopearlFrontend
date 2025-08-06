@@ -806,10 +806,10 @@ const InvoiceCreate = () => {
           </div>
           
           <div className="invoice-header mb-4" style={{ 
-            background: 'linear-gradient(135deg, #051937, #004d7a)',
+            background: 'white',
             padding: '25px',
             borderRadius: '0',
-            color: 'white',
+            color: '#004d7a',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
@@ -829,15 +829,14 @@ const InvoiceCreate = () => {
               />
               <div>
                 <h2 style={{ margin: '0', fontWeight: 'bold', fontSize: '24px' }}>Infopearl Tech Solutions Pvt Ltd</h2>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>G1 Akansha Apartment</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>Patel Nagar, City center</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>7000937390</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>infopearl396@gmail.com</p>
                 <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>www.infopearl.in</p>
               </div>
             </div>
-            <div>
-              <h1 style={{ fontSize: '72px', margin: '0', fontWeight: 'bold', color: '#ffffff' }}>INVOICE</h1>
+            <div style={{ marginRight: '70px' }}>
+            <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>G1 Akansha Apartment</p>
+                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>Patel Nagar, City center</p>
+                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>7000937390</p>
+                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>infopearl396@gmail.com</p>
             </div>
           </div>
 
@@ -881,6 +880,7 @@ const InvoiceCreate = () => {
                     value={formData.invoiceNumber}
                     onChange={handleChange}
                     className="invoice-number-input"
+                    style={{ border: '1px solid lightgray' }}
                   />
                   <InputGroup.Text><i className="bi bi-hash"></i></InputGroup.Text>
                 </InputGroup>
@@ -896,6 +896,7 @@ const InvoiceCreate = () => {
                     name="invoiceDate"
                     value={formData.invoiceDate}
                     onChange={handleChange}
+                    style={{ border: '1px solid lightgray' }}
                   />
                   <InputGroup.Text><i className="bi bi-calendar"></i></InputGroup.Text>
                 </InputGroup>
@@ -908,6 +909,7 @@ const InvoiceCreate = () => {
                     name="dueDate"
                     value={formData.dueDate}
                     onChange={handleChange}
+                    style={{ border: '1px solid lightgray' }}
                   />
                   <InputGroup.Text><i className="bi bi-calendar"></i></InputGroup.Text>
                 </InputGroup>
@@ -1265,8 +1267,8 @@ const InvoiceCreate = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-              background: 'linear-gradient(135deg, #051937, #004d7a)',
-              color: '#fff',
+              background: 'white',
+              color: '#004d7a',
               padding: '20px',
               marginBottom: '30px'
           }}>
@@ -1283,15 +1285,14 @@ const InvoiceCreate = () => {
               />
               <div>
                   <h2 style={{ margin: '0', fontWeight: 'bold', fontSize: '18px' }}>Infopearl Tech Solutions Pvt Ltd</h2>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>G1 Akansha Apartment</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>Patel Nagar, City center</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>7000937390</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>infopearl396@gmail.com</p>
                   <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>www.infopearl.in</p>
               </div>
             </div>
-              <div>
-                <h1 style={{ fontSize: '48px', fontWeight: 'bold', margin: 0 }}>INVOICE</h1>
+              <div style={{ marginRight: '50px' }}>
+              <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>G1 Akansha Apartment</p>
+                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>Patel Nagar, City center</p>
+                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>7000937390</p>
+                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>infopearl396@gmail.com</p>
             </div>
           </div>
 
@@ -1331,7 +1332,7 @@ const InvoiceCreate = () => {
               
             }}>
               <thead>
-                <tr style={{ background: 'linear-gradient(135deg, #051937, #004d7a)', color: '#fff' }}>
+                <tr style={{ background: 'white', color: '#051937', border: '1px solid #051937' }}>
                   <th style={{ padding: '10px', textAlign: 'left' }}>DESCRIPTION</th>
                   <th style={{ padding: '10px', textAlign: 'center' }}>QTY</th>
                   <th style={{ padding: '10px', textAlign: 'right' }}>PRICE</th>
@@ -1396,11 +1397,12 @@ const InvoiceCreate = () => {
                 </div>
                 <div style={{ 
                       display: 'flex',
-                  justifyContent: 'space-between', 
-                  background: 'linear-gradient(135deg, #051937, #004d7a)',
-                  color: '#fff',
-                  padding: '10px',
-                  fontWeight: 'bold'
+                      justifyContent: 'space-between', 
+                      background: 'white',
+                      color: '#051937',
+                      padding: '10px',
+                      fontWeight: 'bold',
+                      border: '1px solid #051937',
                 }}>
                   <p style={{ margin: '0' }}>TOTAL</p>
                   <p style={{ margin: '0' }}>₹{formData.total}</p>

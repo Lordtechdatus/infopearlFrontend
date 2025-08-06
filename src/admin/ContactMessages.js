@@ -133,7 +133,7 @@ const ContactMessages = () => {
         animate="visible"
         variants={fadeIn}
       >
-        <h1>Contact Messages</h1>
+        <h1 style={{ color: 'white' }}>Contact Messages</h1>
         <p>Manage and respond to contact form submissions</p>
       </motion.div>
 

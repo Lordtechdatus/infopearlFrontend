@@ -78,7 +78,7 @@ const AdminLayout = () => {
             <i className="fas fa-envelope-open"></i> Contact Messages
           </Nav.Link>
           
-          <div className="sidebar-section">Invoices Management</div>
+          <div className="sidebar-section"> Management</div>
           
           {/* Customers dropdown */}
           <div className={`nav-item-with-submenu ${openSubMenu === 'customers' ? 'open' : ''}`}>
@@ -162,6 +162,30 @@ const AdminLayout = () => {
                 </Nav.Link>
                 <Nav.Link as={Link} to="/admin/users/add" className={location.pathname === '/admin/users/add' ? 'active' : ''}>
                   <i className="fas fa-user-plus"></i> Add User
+                </Nav.Link>
+              </div>
+            </Collapse>
+          </div>
+
+          {/* Letters dropdown */}
+          <div className={`nav-item-with-submenu ${openSubMenu === 'letters' ? 'open' : ''}`}>
+            <div 
+              className={`nav-link ${isActive('/admin/letters') ? 'active' : ''}`} 
+              onClick={() => toggleSubMenu('letters')}
+            >
+              <i className="fas fa-envelope"></i> Letters
+              <i className={`fas fa-chevron-${openSubMenu === 'letters' ? 'down' : 'right'} submenu-icon`}></i>
+            </div>
+            <Collapse in={openSubMenu === 'letters'}>
+              <div className="submenu">
+                <Nav.Link as={Link} to="/admin/letters" className={location.pathname === '/admin/letters' ? 'active' : ''}>
+                  <i className="fas fa-list"></i> Letter List
+                </Nav.Link>
+                <Nav.Link as={Link} to="/admin/letters/create" className={location.pathname === '/admin/letters/create' ? 'active' : ''}>
+                  <i className="fas fa-plus"></i> Create Letter
+                </Nav.Link>
+                <Nav.Link as={Link} to="/admin/letters/download" className={location.pathname === '/admin/letters/download' ? 'active' : ''}>
+                  <i className="fas fa-download"></i> Download Letters
                 </Nav.Link>
               </div>
             </Collapse>
