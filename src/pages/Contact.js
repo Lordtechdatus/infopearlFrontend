@@ -26,6 +26,7 @@ const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  // REMOVED: const [backendStatus, setBackendStatus] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,43 +40,33 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
-      const response = await fetch('/backend/api/contact/submit.php', {
+      const response = await fetch('https://backend.infopearl.in/submit.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
-
-      const result = await response.json();
-
+    
+      const text = await response.text();
+      console.log("Raw Response:", text);
+    
+      const result = JSON.parse(text); // manually parse
       if (response.ok) {
-        // Show success message
         setSubmitted(true);
-        // Reset form after submission
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: ''
-        });
-        // Reset success message after 5 seconds
-        setTimeout(() => {
-          setSubmitted(false);
-        }, 5000);
+        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+        setTimeout(() => setSubmitted(false), 5000);
       } else {
-        setError(result.message || 'Failed to submit form. Please try again.');
+        setError(result.message || 'Something went wrong.');
       }
     } catch (error) {
-      setError('Network error. Please check your connection and try again.');
-    } finally {
-      setLoading(false);
+      console.error("Fetch error:", error); // 🔍
+      setError('Network error: ' + error.message);
     }
   };
 
+  // REMOVED: testBackendConnection function
   return (
     <div className="page-content">
       {/* Page Header */}
@@ -167,6 +158,11 @@ const Contact = () => {
               viewport={{ once: true }}
               variants={slideUp}
             >
+              {/* Backend connection test UI */}
+              {/* REMOVED: <div style={{ marginBottom: '1em' }}>
+                <button onClick={testBackendConnection}>Test Backend Connection</button>
+                {backendStatus && <div>{backendStatus}</div>}
+              </div> */}
               <h2>Send Us a Message</h2>
               {submitted ? (
                 <div className="success-message">
@@ -189,7 +185,7 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      readOnly={loading}
                     />
                   </div>
                   
@@ -202,7 +198,7 @@ const Contact = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      readOnly={loading}
                     />
                   </div>
                   
@@ -214,7 +210,7 @@ const Contact = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      disabled={loading}
+                      readOnly={loading}
                     />
                   </div>
                   
@@ -227,7 +223,7 @@ const Contact = () => {
                       value={formData.subject}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      readOnly={loading}
                     />
                   </div>
                   
@@ -240,14 +236,14 @@ const Contact = () => {
                       value={formData.message}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      readOnly={loading}
                     ></textarea>
                   </div>
                   
                   <button 
                     type="submit" 
                     className="btn btn-primary"
-                    disabled={loading}
+                    readOnly={loading}
                   >
                     {loading ? 'Sending...' : 'Send Message'}
                   </button>
@@ -285,5 +281,6 @@ const Contact = () => {
     </div>
   );
 };
+
 
 export default Contact; 
