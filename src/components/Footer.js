@@ -5,7 +5,8 @@ import facebook from '../assets/facebook.png';
 import instagram from '../assets/insta.png';
 import linkedin from '../assets/linkedin.png';
 import './Footer.css';
-import { FaFacebookF, FaInstagram, FaLinkedinIn } from 'react-icons/fa';
+import WhatsAppButton from './WhatsAppButton';
+
 
 
 // Default footer data (fallback if localStorage is empty)
@@ -166,6 +167,7 @@ const Footer = () => {
       <div className="footer-bottom">
         <p>{copyrightText || `© ${new Date().getFullYear()} InfoPearl Tech Solutions Pvt. Ltd. All Rights Reserved.`}</p>
       </div>
+      <WhatsAppButton />
     </footer>
   );
 };

@@ -19,12 +19,12 @@ const ContactMessages = () => {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const token = localStorage.getItem('adminToken');
+  // const token = localStorage.getItem('adminToken');
 
   useEffect(() => {
     fetchMessages();
   }, [pagination.current_page, filters]);
-
+  
   const fetchMessages = async () => {
     try {
       setLoading(true);
@@ -35,17 +35,39 @@ const ContactMessages = () => {
         search: filters.search
       });
 
-      const response = await fetch(`/backend/api/contact/list.php?${params}`, {
+      // const response = await fetch(`/backend/api/admin/showmessages.php?${params}`);
+  
+      // const response = await fetch(`/backend/api/admin/showmessages.php?${params}`, {
+      //   headers: {
+      //     'Authorization': `Bearer ${token}`  // Include your token here for authentication
+      //   }
+      // });
+
+      // const response = await fetch(`https://backend.infopearl.in/showmessages.php?${params.toString()}`, {
+      //   method: 'GET',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   // headers: {
+      //   //   'Authorization': `Bearer ${token}`,
+      //   // },
+      // });
+
+      const response = await fetch(`http://localhost:3000/backend/api/admin/showmessages.php?${params.toString()}`, {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+              'Content-Type': 'application/json',
+            },
+        // headers: {
+        //   'Authorization': `Bearer ${token}`,
+        // },
       });
-
+  
       const result = await response.json();
-
+  
       if (response.ok) {
         setMessages(result.data.messages);
-        setPagination(result.data.pagination);
+        setPagination(result.pagination);
       } else {
         setError(result.message || 'Failed to fetch messages');
       }
@@ -62,7 +84,7 @@ const ContactMessages = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          // 'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           id: messageId,
