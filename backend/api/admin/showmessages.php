@@ -17,7 +17,7 @@ if (empty($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
   exit('Forbidden');
 }
 
-require_once '../includes/DatabaseClass.php';
+require_once 'infopearlFrontend/backend/includes/DatabaseClass.php';
 
 $db = new Database();
 $conn = $db->getConnection();

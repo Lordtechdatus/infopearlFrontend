@@ -8,7 +8,7 @@ if (empty($_SESSION['is_admin'])) {
     exit('Forbidden');
 }
 
-require_once '../../includes/DatabaseClass.php';
+require_once '../includes/DatabaseClass.php';
 
 $db = new Database();
 $conn = $db->getConnection();

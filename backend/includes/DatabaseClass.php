@@ -85,6 +85,20 @@ class Database {
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ");
+
+            // career applications table
+            $this->conn->exec("
+                CREATE TABLE career_applications (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    email VARCHAR(255) NOT NULL,
+                    phone VARCHAR(20) NOT NULL,
+                    position VARCHAR(255) NOT NULL,
+                    cv_filename VARCHAR(255) NOT NULL,
+                    status ENUM('new', 'interviewing', 'hired', 'rejected') DEFAULT 'new',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ");
             
             // Create default admin user if not exists
             $stmt = $this->conn->prepare("SELECT id FROM users WHERE username = 'admin'");

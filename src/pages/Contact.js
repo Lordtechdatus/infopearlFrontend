@@ -56,7 +56,7 @@ const Contact = () => {
       if (response.ok) {
         setSubmitted(true);
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-        setTimeout(() => setSubmitted(false), 5000);
+        setTimeout(() => setSubmitted(false), 3000);
       } else {
         setError(result.message || 'Something went wrong.');
       }
