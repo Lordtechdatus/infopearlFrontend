@@ -57,7 +57,7 @@ $pages = ceil($total / $limit);
 $offset = ($page - 1) * $limit;
 
 // Fetch the messages
-$sql = "SELECT id, name, email, phone, subject, message, status, created_at 
+$sql = "SELECT name, email, subject,  created_at, status 
         FROM contact_messages $whereSql
         ORDER BY created_at DESC
         LIMIT :limit OFFSET :offset";
@@ -77,12 +77,12 @@ $response = [
     'data' => [
         'messages' => array_map(function ($message) {
             return [
-                'id' => $message['id'],
+                // 'id' => $message['id'],
                 'name' => $message['name'],
                 'email' => $message['email'],
-                'phone' => $message['phone'],
+                // 'phone' => $message['phone'],
                 'subject' => $message['subject'],
-                'message' => $message['message'],
+                // 'message' => $message['message'],
                 'status' => $message['status'],
                 'formatted_date' => date('Y-m-d H:i:s', strtotime($message['created_at'])),
             ];

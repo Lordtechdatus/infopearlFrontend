@@ -28,12 +28,12 @@ const ContactMessages = () => {
   const fetchMessages = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams({
-        page: pagination.current_page,
-        limit: pagination.limit,
-        status: filters.status,
-        search: filters.search
-      });
+      // const params = new URLSearchParams({
+      //   page: pagination.current_page,
+      //   limit: pagination.limit,
+      //   status: filters.status,
+      //   search: filters.search
+      // });
 
       // const response = await fetch(`/backend/api/admin/showmessages.php?${params}`);
   
@@ -43,7 +43,7 @@ const ContactMessages = () => {
       //   }
       // });
 
-      const response = await fetch(`https://backend.infopearl.in/showmessages.php?${params.toString()}`, {
+      const response = await fetch(`https://backend.infopearl.in/showmessages.php`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

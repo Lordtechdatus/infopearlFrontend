@@ -106,8 +106,9 @@ $response->error('Method not allowed', 405);
 
 // Send email function
 function sendCareerEmail($name, $email, $phone, $position, $cv_filename) {
-    $to = 'infopearl396@gmail.com'; // Your email address
-    $cc = 'ceo@infopearl.in'; // Additional email address (optional)
+    $to = 'ratmelem@gmail.com'; // Your email address
+    $cc = 'mayankratmele12abh@gmail.com';
+    // $cc = 'ceo@infopearl.in'; // Additional email address (optional)
 
     $email_subject = "New Career Application - $position";
 
