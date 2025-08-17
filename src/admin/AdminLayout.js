@@ -178,9 +178,9 @@ const AdminLayout = () => {
             </div>
             <Collapse in={openSubMenu === 'letters'}>
               <div className="submenu">
-                <Nav.Link as={Link} to="/admin/letters" className={location.pathname === '/admin/letters' ? 'active' : ''}>
+                {/* <Nav.Link as={Link} to="/admin/letters" className={location.pathname === '/admin/letters' ? 'active' : ''}>
                   <i className="fas fa-list"></i> Letter List
-                </Nav.Link>
+                </Nav.Link> */}
                 <Nav.Link as={Link} to="/admin/letters/create" className={location.pathname === '/admin/letters/create' ? 'active' : ''}>
                   <i className="fas fa-plus"></i> Create Letter
                 </Nav.Link>

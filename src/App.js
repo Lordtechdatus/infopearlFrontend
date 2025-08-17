@@ -136,7 +136,6 @@ import UserList from './admin/users/UserList';
 import UserAdd from './admin/users/UserAdd';
 import LogoSettings from './admin/ContentManagement/LogoSettings';
 import ContactMessages from './admin/ContactMessages';
-import LetterList from './admin/letters/LetterList';
 import LetterCreate from './admin/letters/LetterCreate';
 import LetterDownload from './admin/letters/LetterDownload';
 
@@ -222,7 +221,7 @@ function App() {
               <Route path="salary/slip" element={<SalarySlip />} />
               <Route path="users" element={<UserList />} />
               <Route path="users/add" element={<UserAdd />} />
-              <Route path="letters" element={<LetterList />} />
+              {/* <Route path="letters" element={<LetterList />} /> */}
               <Route path="letters/create" element={<LetterCreate />} />
               <Route path="letters/download" element={<LetterDownload />} />
             </Route>
