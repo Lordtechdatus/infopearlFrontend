@@ -7,8 +7,6 @@ import linkedin from '../assets/linkedin.png';
 import './Footer.css';
 import WhatsAppButton from './WhatsAppButton';
 
-
-
 // Default footer data (fallback if localStorage is empty)
 const defaultFooterData = {
   about: { description: '' },

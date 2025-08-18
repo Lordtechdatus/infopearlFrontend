@@ -824,7 +824,7 @@ const InvoiceCreate = () => {
                   marginRight: '25px',
                   backgroundColor: 'white',
                   padding: '5px',
-                  borderRadius: '0'
+                  borderRadius: '0',
                 }} 
               />
               <div>
@@ -1264,23 +1264,24 @@ const InvoiceCreate = () => {
           >
             {/* Invoice Header */}
             <div style={{ 
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               background: 'white',
               color: '#004d7a',
               padding: '20px',
-              marginBottom: '30px'
+              marginBottom: '30px',
+              borderBottom: '2px solid #004d7a',
           }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <img 
                   src={logo} 
-                alt="Company Logo" 
-                style={{ 
+                  alt="Company Logo" 
+                  style={{ 
                     height: '80px', 
                     backgroundColor: '#fff',
-                  padding: '5px',
-                    marginRight: '15px'
+                    padding: '5px',
+                    marginRight: '15px',
                 }} 
               />
               <div>

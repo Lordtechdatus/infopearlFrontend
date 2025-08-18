@@ -135,13 +135,6 @@ const Home = () => {
   const featuresImgSrc = featuresImgError ? fallbackImageUrl : FeatureImage;
 
   // Function to open lightbox with the clicked image
-  // const openLightbox = (src, alt) => {
-  //   setCurrentImage({ src, alt });
-  //   setLightboxOpen(true);
-  //   // Prevent scrolling when lightbox is open
-  //   document.body.style.overflow = 'hidden';
-  // };
-
   const openLightbox = (src, alt) => {
     const index = allGalleryImages.findIndex(img => img.src === src);
     setCurrentImage({ src, alt });
@@ -174,7 +167,7 @@ const Home = () => {
         title="Home"
         description="InfoPearl Tech Solutions - Leading provider of academic research support, PhD guidance, web development, software solutions, and technical training. Empowering scholars and advancing research with innovative technology."
         keywords="InfoPearl, PhD guidance, research support, web development, software solutions, technical training, academic research"
-        canonicalUrl="https://yourwebsite.com"
+        canonicalUrl="https://infopearl.in"
       />
       
       {/* Hero Section */}
@@ -1259,7 +1252,7 @@ const Home = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                style={{ marginBottom: 3 }}
+                // style={{ marginBottom: 3 }}
               >
                 KEEP IN TOUCH!
               </motion.h2>
@@ -1271,17 +1264,19 @@ const Home = () => {
                 transition={{ delay: 0.2, duration: 0.5 }}
               >
                 INFOPEARL TECH SOLUTIONS provides PhD  research program and IT SOLUTIONS. You can clarify all your doubts with our team.
-                
-                <a href="tel:+917000937390" className="phone-link">
-                  <i className="fas fa-phone-alt"></i> +91 7000937390
-                </a> 
-                 
-                <a href="mailto:infopearl396@gmail.com" className="email-link">
-                  <i className="fas fa-envelope"></i> infopearl396@gmail.com
-                </a>
-                <a href="mailto:infopearl396@gmail.com" className="email-link">
-                  <i className="fas fa-envelope"></i> ceo@infopearl.in
-                </a>
+
+                <div style={{ marginTop: 25 }}>
+                  <a href="tel:+917000937390" className="phone-link">
+                    <i className="fas fa-phone-alt"></i> +91 7000937390
+                  </a> 
+                  
+                  <a href="mailto:infopearl396@gmail.com" className="email-link">
+                    <i className="fas fa-envelope"></i> infopearl396@gmail.com
+                  </a>
+                  <a href="mailto:infopearl396@gmail.com" className="email-link">
+                    <i className="fas fa-envelope"></i> ceo@infopearl.in
+                  </a>
+                </div>
                 
               </motion.p>
             </div>

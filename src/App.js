@@ -145,7 +145,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 const PopupModal = ({ onClose }) => (
   <div className="popup-overlay">
     <div className="popup-content">
-    <button onClick={onClose} className="close-btn">
+    <button onClick={onClose} className="close-btn" style={{ backgroundColor: 'transparent' }}>
       <i className="fas fa-times"></i>
     </button>
       <h2>Welcome to InfoPearl!</h2>

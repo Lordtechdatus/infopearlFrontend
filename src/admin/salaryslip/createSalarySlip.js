@@ -1145,7 +1145,8 @@ const SalarySlip = () => {
               background: 'white',
               color: '#004d7a',
               padding: '20px',
-              marginBottom: '30px'
+              marginBottom: '30px',
+              borderBottom: '2px solid #004d7a',
             }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <div style={{ 

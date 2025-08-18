@@ -67,7 +67,7 @@
 }
 
 .expertise-card li::before {
-  content: "•";
+  /* content: "•"; */
   color: var(--secondary-color);
   font-weight: bold;
   display: inline-block;
@@ -95,7 +95,7 @@
   font-size: 3rem;
   font-weight: 700;
   color: var(--primary-color);
-  opacity: 0.2;
+  opacity: 0.8;
   margin-right: 2rem;
   line-height: 1;
   min-width: 70px;
