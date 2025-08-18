@@ -341,12 +341,12 @@ const CareerPage = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="cv">Upload CV (PDF/DOC)</label>
+              <label htmlFor="cv">Upload CV (only PDF)</label>
               <input 
                 id="cv"
                 type="file"
                 name="cv_filename"
-                accept=".pdf,.doc,.docx"
+                accept=".pdf"
                 onChange={handleChange}
                 required
               />

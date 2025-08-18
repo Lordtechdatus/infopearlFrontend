@@ -240,8 +240,8 @@ const Navbar = () => {
     <>
       {navData.showContactInfo && (
         <div className="top-bar" style={{ 
-          backgroundColor: navData.topBarBackgroundColor,
-          color: navData.topBarTextColor,
+          backgroundColor: '#ffffff',
+          color: '#051937',
         }}>
           <div className="container">
             <div className="top-bar-content">

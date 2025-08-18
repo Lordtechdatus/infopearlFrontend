@@ -319,14 +319,14 @@ const HeaderSettings = () => {
                         <Form.Control
                           type="color"
                           name="topBarBackgroundColor"
-                          value={headerData.topBarBackgroundColor}
+                          value='#ffffff'
                           onChange={handleInputChange}
                           className="me-2"
                           style={{ width: '50px', height: '38px' }}
                         />
                         <Form.Control
                           type="text"
-                          value={headerData.topBarBackgroundColor}
+                          value='#ffffff'
                           onChange={(e) => handleColorChange('topBarBackgroundColor', e.target.value)}
                           placeholder="e.g. #000000 or rgb(0,0,0)"
                         />

@@ -38,8 +38,11 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // prevent double submit
+  
     setLoading(true);
     setError('');
+  
     try {
       const response = await fetch('https://backend.infopearl.in/submit.php', {
         method: 'POST',
@@ -48,23 +51,35 @@ const Contact = () => {
         },
         body: JSON.stringify(formData),
       });
-    
+  
       const text = await response.text();
       console.log("Raw Response:", text);
-    
-      const result = JSON.parse(text); // manually parse
-      if (response.ok) {
-        setSubmitted(true);
-        setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-        setTimeout(() => setSubmitted(false), 3000);
-      } else {
-        setError(result.message || 'Something went wrong.');
+  
+      // Try to parse JSON; if it isn't JSON, fall back to raw text
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        result = { message: text };
       }
-    } catch (error) {
-      console.error("Fetch error:", error); // 🔍
-      setError('Network error: ' + error.message);
+  
+      if (!response.ok) {
+        throw new Error(result.message || 'Something went wrong.');
+      }
+  
+      setSubmitted(true);
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+  
+      // Hide success after a bit (optional)
+      setTimeout(() => setSubmitted(false), 3000);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError(err.message ? `Network or server error: ${err.message}` : 'Network error.');
+    } finally {
+      setLoading(false); // <-- critical so next submission works
     }
   };
+  
 
   // REMOVED: testBackendConnection function
   return (
@@ -243,10 +258,11 @@ const Contact = () => {
                   <button 
                     type="submit" 
                     className="btn btn-primary"
-                    readOnly={loading}
+                    disabled={loading}   // <-- use disabled, not readOnly
                   >
                     {loading ? 'Sending...' : 'Send Message'}
                   </button>
+
                 </form>
               )}
             </motion.div>

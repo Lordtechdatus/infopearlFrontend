@@ -59,7 +59,7 @@
 }
 
 .service-features li::before {
-  content: "•";
+  /* content: "•"; */
   color: var(--secondary-color);
   font-weight: bold;
   display: inline-block;
