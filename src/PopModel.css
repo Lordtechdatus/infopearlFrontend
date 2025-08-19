@@ -10,6 +10,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: auto;
   }
   
   .popup-content {
@@ -21,6 +22,7 @@
     text-align: center;
     animation: fadeIn 0.3s ease-out;
     position: relative;
+    pointer-events: auto;
   }
   
   .popup-content h2 {

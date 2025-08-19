@@ -48,16 +48,29 @@ import LetterDownload from './admin/letters/LetterDownload';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const PopupModal = ({ onClose }) => (
-  <div className="popup-overlay">
-    <div className="popup-content">
-    <button onClick={onClose} className="close-btn" style={{ backgroundColor: 'transparent' }}>
-      <i className="fas fa-times"></i>
-    </button>
+  <div
+    className="popup-overlay"
+    // This will intercept outside clicks and do nothing
+    onClick={(e) => e.stopPropagation()}
+  >
+    <div
+      className="popup-content"
+      // Prevent overlay clicks when clicking inside modal content
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        onClick={onClose}
+        className="close-btn"
+        style={{ backgroundColor: 'transparent' }}
+      >
+        <i className="fas fa-times"></i>
+      </button>
       <h2>Welcome to InfoPearl!</h2>
       <p>Explore our career opportunities and get in touch with us.</p>
     </div>
   </div>
 );
+
 
 function App() {
   const [showPopup, setShowPopup] = useState(false);
@@ -99,7 +112,7 @@ function App() {
             <Route path="/expertise" element={<><Navbar /><Expertise /><Footer /></>} />
             <Route path="/contact" element={<><Navbar /><Contact /><Footer /></>} />
             <Route path="/training-topics" element={<><Navbar /><TrainingTopics /><Footer /></>} />
-            <Route path="/upi" element={<><Navbar /><UPI /><Footer /></>} />
+            {/* <Route path="/upi" element={<><Navbar /><UPI /><Footer /></>} /> */}
             <Route path="/payment" element={<><Navbar /><Payment /><Footer /></>} />
             <Route path="/career" element={<><Navbar /><Careerpage /><Footer /></>} />
 

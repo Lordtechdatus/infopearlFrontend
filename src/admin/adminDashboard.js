@@ -70,6 +70,18 @@ const AdminDashboard = () => {
           />
         </div>
       </div>
+
+      <div className="mb-4">
+        <h5 className="border-bottom pb-2 mb-3">Communication</h5>
+        <div className="cards-container">
+          <DashboardCard 
+            icon="fa-users"
+            title="Contact Management"
+            description="Manage all your Contacts data in one place"
+            href="/admin/contact-messages"
+          />
+        </div>
+      </div>
       
       <div className="mb-4">
         <h5 className="border-bottom pb-2 mb-3">Invoice Management</h5>

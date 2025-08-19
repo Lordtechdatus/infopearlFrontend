@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import './ContactMessages.css';
 
@@ -8,12 +8,11 @@ const ContactMessages = () => {
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({
     current_page: 1,
-    total_pages: 1,
-    total_count: 0,
+    total_pages: 1,   // server-provided; UI will compute derived values instead
+    total_count: 0,   // server-provided; UI will compute derived values instead
     limit: 10,
   });
   const [filters, setFilters] = useState({
-    status: 'all',
     search: '',
   });
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -23,27 +22,25 @@ const ContactMessages = () => {
   useEffect(() => {
     fetchMessages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination.current_page, filters, selectedTab]);
+  }, [pagination.current_page, selectedTab]);
 
   const listEndpoint =
     selectedTab === 'contact'
       ? 'https://backend.infopearl.in/showmessages.php'
       : 'https://backend.infopearl.in/career-showmessages.php';
 
-  const statusEndpoint =
+  // Delete endpoints
+  const deleteEndpoint =
     selectedTab === 'contact'
-      ? 'https://backend.infopearl.in/contact-status.php'
-      : 'https://backend.infopearl.in/career-status.php'; // career status endpoint
+      ? 'https://backend.infopearl.in/contact-delete.php'
+      : 'https://backend.infopearl.in/career-delete.php';
 
   const fetchMessages = async () => {
     try {
       setLoading(true);
       setError('');
 
-      // (Optional) if server supports query params for pagination/filters, append here
-      const url = listEndpoint;
-
-      const response = await fetch(url, {
+      const response = await fetch(listEndpoint, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -52,7 +49,13 @@ const ContactMessages = () => {
 
       if (response.ok) {
         setMessages(result?.data?.messages || []);
-        setPagination(result?.pagination || { current_page: 1, total_pages: 1, total_count: 0, limit: 10 });
+        // Keep server pagination for compatibility, but UI will compute client totals
+        setPagination((prev) => ({
+          ...prev,
+          total_pages: result?.pagination?.total_pages ?? 1,
+          total_count: result?.pagination?.total_count ?? (result?.data?.messages?.length ?? 0),
+          limit: result?.pagination?.limit ?? prev.limit,
+        }));
       } else {
         setError(result?.message || 'Failed to fetch messages');
       }
@@ -63,46 +66,66 @@ const ContactMessages = () => {
     }
   };
 
-  // Calls TWO APIs for each action:
-  // 1) PUT to update status (contact or career)
-  // 2) GET to refresh the list (contact or career)
-  const updateMessageStatus = async (messageId, newStatus) => {
+  // Client-side search (name/email) + client-side pagination over fetched messages
+  const normalize = (s = '') => String(s).toLowerCase();
+  const filteredMessages = useMemo(() => {
+    const q = normalize(filters.search);
+    if (!q) return messages;
+    return messages.filter((m) => {
+      const name = normalize(m.name);
+      const email = normalize(m.email);
+      return name.includes(q) || email.includes(q);
+    });
+  }, [messages, filters.search]);
+
+  // Derived pagination (client side)
+  const pageLimit = pagination.limit || 10;
+  const totalCount = filteredMessages.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageLimit));
+  const currentPage = Math.min(pagination.current_page, totalPages);
+  const start = (currentPage - 1) * pageLimit;
+  const pagedMessages = filteredMessages.slice(start, start + pageLimit);
+
+  const deleteMessage = async (messageId) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this entry? This action cannot be undone.');
+    if (!confirmDelete) return;
+
+    // Optimistic UI
+    const prevMessages = messages;
+    setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
     try {
       setError('');
-
-      // 1) Update status
-      const response = await fetch(statusEndpoint, {
-        method: 'PUT',
+      const response = await fetch(deleteEndpoint, {
+        method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: messageId, status: newStatus }),
+        body: JSON.stringify({ id: messageId }),
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        setError(result?.message || 'Failed to update status');
+        setError(result?.message || 'Failed to delete entry');
+        setMessages(prevMessages); // revert on failure
         return;
       }
 
-      // Optimistic UI update
-      setMessages((prev) =>
-        prev.map((msg) => (msg.id === messageId ? { ...msg, status: newStatus } : msg))
-      );
-
-      // 2) Re-fetch the current list to ensure fresh data
+      // Re-sync list (counts, etc.)
       await fetchMessages();
     } catch {
+      setMessages(prevMessages);
       setError('Network error. Please try again.');
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+  const handleFilterChange = (value) => {
+    setFilters({ search: value });
     setPagination((prev) => ({ ...prev, current_page: 1 }));
   };
 
   const handlePageChange = (page) => {
-    setPagination((prev) => ({ ...prev, current_page: page }));
+    const clamped = Math.max(1, Math.min(page, totalPages));
+    setPagination((prev) => ({ ...prev, current_page: clamped }));
   };
 
   const openMessageModal = (message) => {
@@ -115,6 +138,7 @@ const ContactMessages = () => {
     setSelectedMessage(null);
   };
 
+  // Status badge kept for modal display (optional)
   const getStatusBadge = (status) => {
     const statusConfigContact = {
       new: { class: 'badge-new', text: 'New' },
@@ -122,62 +146,66 @@ const ContactMessages = () => {
       replied: { class: 'badge-replied', text: 'Replied' },
       archived: { class: 'badge-archived', text: 'Archived' },
     };
-
     const statusConfigCareer = {
       new: { class: 'badge-new', text: 'New' },
       interviewing: { class: 'badge-read', text: 'Interviewing' },
       hired: { class: 'badge-replied', text: 'Hired' },
       rejected: { class: 'badge-archived', text: 'Rejected' },
     };
-
     const map = selectedTab === 'contact' ? statusConfigContact : statusConfigCareer;
     const config = map[status] || { class: 'badge-default', text: status };
     return <span className={`status-badge ${config.class}`}>{config.text}</span>;
   };
 
+  // Headers: add ID first, remove Status
   const renderTableHeaders = () => {
     if (selectedTab === 'career') {
       return (
         <div className="table-header">
+          <div className="header-cell">ID</div>
           <div className="header-cell">Name</div>
           <div className="header-cell">Email</div>
           <div className="header-cell">Position</div>
           <div className="header-cell">Date</div>
-          <div className="header-cell">Status</div>
           <div className="header-cell">Actions</div>
         </div>
       );
     }
-    // contact
     return (
       <div className="table-header">
+        <div className="header-cell">ID</div>
         <div className="header-cell">Name</div>
         <div className="header-cell">Email</div>
         <div className="header-cell">Subject</div>
         <div className="header-cell">Date</div>
-        <div className="header-cell">Status</div>
         <div className="header-cell">Actions</div>
       </div>
     );
   };
 
-  const statusOptions = selectedTab === 'career'
-    ? [
-        { value: 'new', label: 'New' },
-        { value: 'interviewing', label: 'Interviewing' },
-        { value: 'hired', label: 'Hired' },
-        { value: 'rejected', label: 'Rejected' },
-      ]
-    : [
-        { value: 'new', label: 'New' },
-        { value: 'read', label: 'Read' },
-        { value: 'replied', label: 'Replied' },
-        { value: 'archived', label: 'Archived' },
-      ];
-
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  // Helpers for career modal actions
+  const getCvDownloadUrl = (filename) =>
+    `https://backend.infopearl.in/uploads/cv/${encodeURIComponent(filename)}`; // <-- adjust path if needed
+
+  const downloadCv = (filename) => {
+    if (!filename) {
+      setError('No CV found to download.');
+      return;
+    }
+    const url = getCvDownloadUrl(filename);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const openGmailCompose = (email, subject = '') => {
+    const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}${
+      subject ? `&su=${encodeURIComponent(subject)}` : ''
+    }`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -186,9 +214,7 @@ const ContactMessages = () => {
         <h1 style={{ color: 'white' }}>
           {selectedTab === 'contact' ? 'Contact Messages' : 'Career Applications'}
         </h1>
-        <p>
-          Manage and respond to {selectedTab === 'contact' ? 'contact' : 'career'} form submissions
-        </p>
+        <p>Manage and respond to {selectedTab === 'contact' ? 'contact' : 'career'} form submissions</p>
       </motion.div>
 
       <motion.div
@@ -200,21 +226,7 @@ const ContactMessages = () => {
       >
         {/* Filters */}
         <div className="filters-section">
-          <div className="filter-group">
-            <label htmlFor="status-filter">Status:</label>
-            <select
-              id="status-filter"
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-            >
-              <option value="all">All Messages</option>
-              {statusOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Removed Status dropdown as requested */}
 
           <div className="filter-group">
             <label htmlFor="search-filter">Search:</label>
@@ -223,23 +235,29 @@ const ContactMessages = () => {
               id="search-filter"
               placeholder={
                 selectedTab === 'contact'
-                  ? 'Search by name, email, subject...'
-                  : 'Search by name, email, position...'
+                  ? 'Search by name or email...'
+                  : 'Search by name or email...'
               }
               value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
+              onChange={(e) => handleFilterChange(e.target.value)}
             />
           </div>
 
           <div className="tabs">
             <button
-              onClick={() => setSelectedTab('contact')}
+              onClick={() => {
+                setSelectedTab('contact');
+                setPagination((p) => ({ ...p, current_page: 1 }));
+              }}
               className={selectedTab === 'contact' ? 'active' : ''}
             >
               Contact Messages
             </button>
             <button
-              onClick={() => setSelectedTab('career')}
+              onClick={() => {
+                setSelectedTab('career');
+                setPagination((p) => ({ ...p, current_page: 1 }));
+              }}
               className={selectedTab === 'career' ? 'active' : ''}
             >
               Career Applications
@@ -267,12 +285,12 @@ const ContactMessages = () => {
               {renderTableHeaders()}
 
               <div className="table-body">
-                {messages.length === 0 ? (
+                {pagedMessages.length === 0 ? (
                   <div className="no-messages">
                     <p>No messages found</p>
                   </div>
                 ) : (
-                  messages.map((message) => (
+                  pagedMessages.map((message) => (
                     <motion.div
                       key={message.id}
                       className="table-row"
@@ -280,12 +298,16 @@ const ContactMessages = () => {
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.3 }}
                     >
+                      <div className="cell id-cell">
+                        <strong>{message.id}</strong>
+                      </div>
+
                       <div className="cell name-cell">
                         <strong>{message.name}</strong>
                       </div>
+
                       <div className="cell email-cell">{message.email}</div>
 
-                      {/* Subject (contact) or Position (career) */}
                       {selectedTab === 'contact' ? (
                         <div className="cell subject-cell">{message.subject}</div>
                       ) : (
@@ -293,24 +315,22 @@ const ContactMessages = () => {
                       )}
 
                       <div className="cell date-cell">{message.formatted_date}</div>
-                      <div className="cell status-cell">{getStatusBadge(message.status)}</div>
 
+                      {/* ACTIONS: view (eye icon) + delete (dustbin) */}
                       <div className="cell actions-cell">
-                        <button className="btn-view" onClick={() => openMessageModal(message)}>
+                        <button className="btn-view" onClick={() => openMessageModal(message)} title="View">
+                          <i className="fas fa-eye" style={{ marginRight: 6 }}></i>
                           View
                         </button>
-                        <div className="status-dropdown">
-                          <select
-                            value={message.status}
-                            onChange={(e) => updateMessageStatus(message.id, e.target.value)}
-                          >
-                            {statusOptions.map((opt) => (
-                              <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+
+                        <button
+                          className="btn-delete"
+                          onClick={() => deleteMessage(message.id)}
+                          title="Delete"
+                          aria-label={`Delete message from ${message.name}`}
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
                       </div>
                     </motion.div>
                   ))
@@ -320,25 +340,24 @@ const ContactMessages = () => {
           )}
         </div>
 
-        {/* Pagination */}
-        {pagination.total_pages > 1 && (
+        {/* Pagination (client-side derived) */}
+        {totalPages > 1 && (
           <div className="pagination">
             <button
-              onClick={() => handlePageChange(pagination.current_page - 1)}
-              disabled={pagination.current_page === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
               className="pagination-btn"
             >
               Previous
             </button>
 
             <span className="page-info">
-              Page {pagination.current_page} of {pagination.total_pages} ({pagination.total_count} total
-              messages)
+              Page {currentPage} of {totalPages} ({totalCount} total messages)
             </span>
 
             <button
-              onClick={() => handlePageChange(pagination.current_page + 1)}
-              disabled={pagination.current_page === pagination.total_pages}
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
               className="pagination-btn"
             >
               Next
@@ -359,12 +378,14 @@ const ContactMessages = () => {
           >
             <div className="modal-header">
               <h2>Details</h2>
-              <button
-                onClick={closeModal}
-                style={{ color: 'black', backgroundColor: 'white', border: 'none', fontSize: '30px' }}
-              >
-                ×
-              </button>
+
+              {/* Contact: keep close button; Career: remove it */}
+                <button
+                  onClick={closeModal}
+                  style={{ color: 'black', backgroundColor: 'white', border: 'none', fontSize: '30px' }}
+                >
+                  ×
+                </button>
             </div>
 
             <div className="modal-content">
@@ -392,7 +413,6 @@ const ContactMessages = () => {
                   </>
                 ) : (
                   <>
-                    {/* Career modal fields: email, phone, position, status, cv_filename */}
                     <div className="info-row">
                       <label>Email:</label>
                       <span>{selectedMessage.email}</span>
@@ -420,18 +440,48 @@ const ContactMessages = () => {
 
             <div className="modal-footer">
               {selectedTab === 'contact' ? (
-                <button
-                  className="btn-reply"
-                  onClick={() =>
-                    window.open(`mailto:${selectedMessage.email}?subject=Re: ${selectedMessage.subject}`)
-                  }
-                >
-                  Reply via Email
-                </button>
-              ) : null}
-              <button className="btn-close" onClick={closeModal}>
-                Close
-              </button>
+                <>
+                  <button
+                    className="btn-reply"
+                    onClick={() =>
+                      openGmailCompose(
+                        selectedMessage.email,
+                        selectedMessage.position
+                          ? `Regarding your application for ${selectedMessage.position}`
+                          : 'Regarding your application'
+                      )
+                    }
+                  >
+                    Reply via Email
+                  </button>
+                  <button className="btn-close" onClick={closeModal}>
+                    Close
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="btn-download"
+                    onClick={() => downloadCv(selectedMessage.cv_filename)}
+                  >
+                    Download PDF
+                  </button>
+                  <button
+                    className="btn-reply"
+                    onClick={() =>
+                      openGmailCompose(
+                        selectedMessage.email,
+                        selectedMessage.position
+                          ? `Regarding your application for ${selectedMessage.position}`
+                          : 'Regarding your application'
+                      )
+                    }
+                  >
+                    Reply via Email
+                  </button>
+                  {/* No explicit Close button; click outside the modal to close */}
+                </>
+              )}
             </div>
           </motion.div>
         </div>

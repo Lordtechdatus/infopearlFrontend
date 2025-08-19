@@ -18,7 +18,7 @@
 }
 
 .page-header p {
-  color: #7f8c8d;
+  color: #c9d8d9;
   font-size: 1.1rem;
 }
 
@@ -515,3 +515,41 @@
     text-align: center;
   }
 } 
+
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-delete {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  border-color: rgba(255,255,255,0.4);
+}
+
+/* Keep actions tidy
+.actions-cell { display: flex; gap: 8px; align-items: center; }
+.btn-view { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Career modal: ensure footer buttons look primary */
+/* .btn-download, .btn-reply, .btn-close {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: #fff;
+  cursor: pointer;
+} */ 
+/* .btn-reply { you can style differently if you want } */
