@@ -5,7 +5,7 @@ const TeamMembers = () => {
   const teamMembers = [
     {
       id: 1,
-      name: 'MR.Dharmendra Prajapati',
+      name: 'Mr. Dharmendra Prajapati',
       position: 'Managing Director & CEO',
       bio: 'Infopearltech Solutions Pvt.Ltd.',
       // email: 'info@infopearltech.com',
@@ -18,7 +18,7 @@ const TeamMembers = () => {
     },
     {
       id: 2,
-      name: 'Dr.Kamal Sharma',
+      name: 'Dr. Kamal Sharma',
       position: 'Managing Director & CEO',
       bio: 'Lord-Tech Datus Solutions Pvt.Ltd.',
       image: require('../assets/kamal.jpg'),
@@ -30,7 +30,7 @@ const TeamMembers = () => {
     
     {
       id: 3,
-      name: 'Ms.Harshita Rajawat',
+      name: 'Ms. Harshita Rajawat',
       position: ' Data Scientist',
       bio: ' Expertise in Data Analysis and Programming.',
       image: require('../assets/t4.jpg'),
@@ -38,15 +38,15 @@ const TeamMembers = () => {
     },
     {
       id: 4,
-      name: 'MR.Pushpendra Prajapati',
-      position: 'Front end Developer',
+      name: 'Mr. Pushpendra Prajapati',
+      position: 'Frontend Developer',
       bio: 'Creates beautiful and intuitive user interfaces.',
       image: require('../assets/t4.jpg'),
       showSocialLinks: false
     },
     {
       id: 5,
-      name: 'MR.Prateek bajpayee', 
+      name: 'Mr. Prateek Bajpayee', 
       position: 'Full Stack Developer',
       bio: 'Full-stack developer with expertise in React and Node.js.',
       image: require('../assets/t4.jpg'),
@@ -54,7 +54,7 @@ const TeamMembers = () => {
     },
     {
       id: 6,
-      name: 'MR.Nakul Prajapati',   
+      name: 'Mr. Nakul Prajapati',   
       position: 'Civil Engineer',
       bio: ' Expertise in Civil Engineering.',
       image: require('../assets/t4.jpg'),

@@ -251,11 +251,12 @@ const Navbar = () => {
                   <span style={{ color: navData.topBarTextColor }}>{navData.email}</span>
                 </a>
                 <a href={`tel:${navData.phone}`} className="contact-link" style={{ color: navData.topBarTextColor }}>
-                  <img 
+                  {/* <img 
                     src="https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Flag_of_India.svg/1200px-Flag_of_India.svg.png" 
                     alt="Indian Flag" 
                     className="phone-flag" 
-                  />
+                  /> */}
+                  <i className="fas fa-phone" style={{ color: navData.topBarTextColor }}></i>
                   <span style={{ color: navData.topBarTextColor }}>{navData.phone}</span>
                 </a>
               </div>

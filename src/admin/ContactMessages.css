@@ -436,7 +436,7 @@
   background: #218838;
 }
 
-.btn-close {
+/* .btn-close {
   background: #5a6268;
   color: white;
   border: none;
@@ -446,7 +446,7 @@
   font-weight: 500;
   flex: 1;
   transition: background-color 0.2s ease;
-}
+} */
 
 .btn-close:hover {
   background: #5a6268;

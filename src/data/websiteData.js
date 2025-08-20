@@ -12,7 +12,7 @@ export const navData = {
     { 
       id: 2, 
       text: "About", 
-      path: "/about", 
+      path: "#", 
       dropdown: true,
       dropdownItems: [
         { id: 21, text: "About Us", path: "/about" },
@@ -23,8 +23,8 @@ export const navData = {
       id: 3, 
       text: "Services", 
       path: "/services", 
-      dropdown: true,
-      megaMenu: true,
+      dropdown: false,
+      megaMenu: false,
       categories: [
         {
           id: 31,
@@ -71,9 +71,9 @@ export const navData = {
     { 
       id: 6, 
       text: "PAY NOW", 
-      path: "#", 
-      dropdown: true,
-      isButton: true,
+      path: "/payment", 
+      dropdown: false,
+      isButton: false,
       dropdownItems: [
         { id: 61, text: "UPI", path: "/upi" },
         { id: 62, text: "Payment", path: "/payment" }

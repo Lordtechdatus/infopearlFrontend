@@ -448,13 +448,16 @@ const ContactMessages = () => {
                         selectedMessage.email,
                         selectedMessage.position
                           ? `Regarding your application for ${selectedMessage.position}`
-                          : 'Regarding your application'
+                            : `Regarding your application about ${selectedMessage.subject}`
                       )
                     }
                   >
                     Reply via Email
                   </button>
-                  <button className="btn-close" onClick={closeModal}>
+                  {/* <button className="btn-close" onClick={closeModal}>
+                    Close
+                  </button> */}
+                  <button onClick={closeModal} className="button" style={{ backgroundColor: 'gray', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', flex: 1, padding: '10px 20px', fontWeight: 'bold' }}>
                     Close
                   </button>
                 </>
