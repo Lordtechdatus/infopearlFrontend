@@ -23,45 +23,45 @@ export const navData = {
       id: 3, 
       text: "Services", 
       path: "/services", 
-      dropdown: false,
-      megaMenu: false,
+      dropdown: true,
+      megaMenu: true,
       categories: [
         {
           id: 31,
           title: "WEBSITES",
           items: [
-            { id: 311, text: "Website Designing", path: "/services/website-designing" },
-            { id: 312, text: "Website Development", path: "/services/website-development" }
+            { id: 311, text: "Website Designing" },
+            { id: 312, text: "Website Development" }
           ]
         },
         {
           id: 32,
           title: "MOBILE APPLICATION",
           items: [
-            { id: 321, text: "App Designing & Development", path: "/services/app-development" }
+            { id: 321, text: "App Designing & Development" }
           ]
         },
         {
           id: 33,
           title: "DIGITAL MARKETING",
           items: [
-            { id: 331, text: "Digital Marketing Package", path: "/services/digital-marketing" },
-            { id: 332, text: "Search Engine Optimization", path: "/services/seo" },
-            { id: 333, text: "Social Media Marketing", path: "/services/social-media" },
-            { id: 334, text: "Affiliate Marketing", path: "/services/affiliate-marketing" },
-            { id: 335, text: "SMS Marketing", path: "/services/sms-marketing" },
-            { id: 336, text: "Email Marketing", path: "/services/email-marketing" }
+            { id: 331, text: "Digital Marketing Package" },
+            { id: 332, text: "Search Engine Optimization" },
+            { id: 333, text: "Social Media Marketing" },
+            { id: 334, text: "Affiliate Marketing" },
+            { id: 335, text: "SMS Marketing" },
+            { id: 336, text: "Email Marketing" }
           ]
         },
         {
           id: 34,
           title: "GRAPHICS DESIGN",
           items: [
-            { id: 341, text: "Logo Designing", path: "/services/logo-design" },
-            { id: 342, text: "Company Branding", path: "/services/company-branding" },
-            { id: 343, text: "Business PDF", path: "/services/business-pdf" },
-            { id: 344, text: "Business Poster / Banner", path: "/services/business-poster" },
-            { id: 345, text: "Business Booklet", path: "/services/business-booklet" }
+            { id: 341, text: "Logo Designing" },
+            { id: 342, text: "Company Branding" },
+            { id: 343, text: "Business PDF" },
+            { id: 344, text: "Business Poster / Banner" },
+            { id: 345, text: "Business Booklet"}
           ]
         }
       ]

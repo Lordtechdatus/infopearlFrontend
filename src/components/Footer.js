@@ -89,21 +89,21 @@ const Footer = () => {
             {/* Social Icons after contact info */}
             <div className="footer-social-icons">
               <a
-                href="https://www.facebook.com/infopearltech"
+                href="https://www.facebook.com/profile.php?id=61574062030108&mibextid=rS40aB7S9Ucbxw6v"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <img src={facebook} alt='Facebook icon' style={{ height: '30px' }}/>
               </a>
               <a
-                href="https://www.instagram.com/infopearltech"
+                href="https://www.instagram.com/infopearl_?utm_source=qr&igsh=c2I1eXE5Z3J4d3Jn"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <img src={instagram} alt='Instagram icon' style={{ height: '30px' }}/>
               </a>
               <a
-                href="https://www.linkedin.com/company/infopearltech"
+                href="https://www.linkedin.com/in/dharmendra-prajapati-43b25262/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
