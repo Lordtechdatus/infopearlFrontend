@@ -79,6 +79,7 @@ const AdminDashboard = () => {
             title="Contact Management"
             description="Manage all your Contacts data in one place"
             href="/admin/contact-messages"
+            to="/admin/contact-messages"
           />
         </div>
       </div>
