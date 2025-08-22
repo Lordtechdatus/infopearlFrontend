@@ -258,7 +258,7 @@ const Home = () => {
               variants={slideLeft}
             >
               <img 
-                src={require('../assets/img.png')} 
+                src={require('../assets/front.avif')} 
                 alt="About InfoPearl Tech" 
                 className="about-img"
               />

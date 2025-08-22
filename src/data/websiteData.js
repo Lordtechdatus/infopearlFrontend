@@ -206,7 +206,7 @@ export const footerData = {
   address: "InfoPearl Technology" ,
   email: "infopearl396@gmail.com",
   phone: "+91 70009 37390",
-  socialLinks: [,
+  socialLinks: [
     { icon: "fab fa-facebook-f", url: "https://facebook.com/infopearltechsolutions" },
     { icon: "fab fa-twitter", url: "https://twitter.com/infopearl" },
     { icon: "fab fa-linkedin-in", url: "https://linkedin.com/company/infopearltechsolutions" },

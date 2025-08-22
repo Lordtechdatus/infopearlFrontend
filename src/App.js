@@ -16,7 +16,7 @@ import Expertise from './pages/Expertise';
 import Contact from './pages/Contact';
 import TrainingTopics from './pages/TrainingTopics';
 import TeamMembers from './pages/TeamMembers';
-import UPI from './pages/UPI';
+// import UPI from './pages/UPI';
 import Payment from './pages/Payment';
 import LoginPage from './pages/LoginPage';
 import Careerpage from './pages/Careerpage';
