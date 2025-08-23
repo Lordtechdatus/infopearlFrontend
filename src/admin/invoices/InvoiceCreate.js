@@ -1,15 +1,54 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Container, Row, Col, Form, Button, Card, InputGroup, Table, Alert, Modal, ListGroup } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Card, InputGroup, Alert, Modal, ListGroup } from 'react-bootstrap';
 import logo from '../../assets/logo1.png';
 import signature from '../../admin/signature.png';
 import './InvoiceCreate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useNavigate } from 'react-router-dom';
+import QRCode from 'react-qr-code';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
+// =========================
+// API base + upload helper
+// =========================
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://backend.infopearl.in';
+
+// Upload pdf + metadata to backend (PHP endpoint that saves DB row + /uploads/invoices file)
+async function uploadInvoicePdf(pdfBlob, meta) {
+  const form = new FormData();
+  form.append('pdf', pdfBlob, `Invoice_${meta.invoiceNumber}.pdf`);
+  form.append('meta', JSON.stringify(meta)); // backend will parse JSON
+
+  // If you don't have rewrite rules, keep the .php file path:
+  const endpoint = `${API_BASE}/create-invoices.php`;
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    body: form, // no Content-Type header; browser sets it
+  });
+
+  let data = {};
+  try {
+    data = await res.json();
+  } catch (_) {
+    // ignore JSON parse error to surface a helpful message below
+  }
+  if (!res.ok || data.status !== 'success') {
+    throw new Error(data.message || `Upload failed with ${res.status}`);
+  }
+  // expected { status:'success', fileUrl, filename, invoice_no, id }
+  return data;
+}
+
+// Convert DD/MM/YYYY -> YYYY-MM-DD for backend DB
+function toISODate(ddmmyyyy) {
+  if (!ddmmyyyy || !ddmmyyyy.includes('/')) return ddmmyyyy;
+  const [d, m, y] = ddmmyyyy.split('/');
+  if (!d || !m || !y) return ddmmyyyy;
+  return `${y.padStart(4, '0')}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+}
+
 const InvoiceCreate = () => {
-  // Add navigate for redirecting after form submission
   const navigate = useNavigate();
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -18,11 +57,10 @@ const InvoiceCreate = () => {
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // State for form data
   const [formData, setFormData] = useState({
     invoiceType: 'Invoice',
     status: 'Open',
-    invoiceNumber: '', // This will be auto-generated based on ID
+    invoiceNumber: '',
     invoiceDate: '',
     dueDate: '',
     customerInfo: {
@@ -47,85 +85,59 @@ const InvoiceCreate = () => {
     cgst: '0.00',
     sgst: '0.00',
     total: '0.00',
-    nextId: '0' // Added field for auto-filled ID
+    nextId: '0',
+    taxInclusive: false,
   });
 
-  // Reference for the form to be printed
   const printRef = useRef(null);
-
-  // Reference for the invoice preview
   const invoiceRef = useRef(null);
   
-  // Auto-fill current date and calculate next ID when component mounts
+  // Auto-fill current date and next invoice id/number
   useEffect(() => {
-    // Calculate date information
     const today = new Date();
     const formattedDate = formatDate(today);
-    
-    // Set due date 7 days from now
     const dueDate = new Date();
     dueDate.setDate(today.getDate() + 7);
     const formattedDueDate = formatDate(dueDate);
-    
-    // Get the next invoice ID from dedicated localStorage entry
-    let nextId = 1; // Default to 1 if not found
+
+    let nextId = 1;
     try {
-      // Try to get the next_invoice_id from localStorage
       const storedNextId = localStorage.getItem('next_invoice_id');
-      
       if (storedNextId) {
-        // If it exists, parse it
         const parsedId = parseInt(storedNextId);
         if (!isNaN(parsedId) && parsedId >= 1) {
           nextId = parsedId;
         } else {
-          // If invalid, reset to 1 and update localStorage
           localStorage.setItem('next_invoice_id', '1');
         }
       } else {
-        // If it doesn't exist, check if we have existing invoices
         const savedInvoicesString = localStorage.getItem('invoices');
-        
         if (savedInvoicesString) {
           const savedInvoices = JSON.parse(savedInvoicesString);
-          
           if (Array.isArray(savedInvoices) && savedInvoices.length > 0) {
-            // Find the highest existing invoice ID
             const numericIds = savedInvoices
               .map(inv => {
-                // Try to extract the numeric part from invoice number if available
                 if (inv.invoiceNumber && inv.invoiceNumber.startsWith('INV')) {
                   const numPart = inv.invoiceNumber.replace('INV', '');
                   return parseInt(numPart);
                 }
-                // Otherwise use ID if it's numeric
                 const idNum = parseInt(inv.id);
                 return isNaN(idNum) ? 0 : idNum;
               })
               .filter(id => !isNaN(id));
-              
             if (numericIds.length > 0) {
-              // Get the maximum ID and add 1 for the next ID
               nextId = Math.max(...numericIds, 1) + 1;
             }
           }
         }
-        
-        // Initialize next_invoice_id in localStorage
         localStorage.setItem('next_invoice_id', nextId.toString());
       }
-      
-      console.log("Using invoice ID for new invoice:", nextId);
     } catch (error) {
       console.error("Error determining next invoice ID:", error);
-      // In case of any error, use 1 and reset localStorage
       localStorage.setItem('next_invoice_id', '1');
     }
-    
-    // Format invoice number based on ID (e.g., INV0001)
+
     const formattedInvoiceNumber = `INV${nextId.toString().padStart(4, '0')}`;
-    
-    // Update form data with dates and next ID
     setFormData(prev => ({
       ...prev,
       invoiceDate: formattedDate,
@@ -158,13 +170,12 @@ const InvoiceCreate = () => {
     return `${day}/${month}/${year}`;
   };
 
-  // Handle input changes
+  // Input handlers
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Handle customer info changes
   const handleCustomerInfoChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -173,171 +184,151 @@ const InvoiceCreate = () => {
     }));
   };
 
-  // Handle item changes
+  // Item edits
   const handleItemChange = (index, field, value) => {
     const newItems = [...formData.items];
-    
-    // For price field, ensure it only contains numeric values
+
     if (field === 'price') {
-      // Allow only numbers and decimal point
       if (!/^(\d*\.?\d*)$/.test(value) && value !== '') {
-        return; // Reject non-numeric input
+        return;
       }
     }
-    
-    // Update the specific field
+
     newItems[index][field] = value;
-    
-    // Calculate amount for this item
+
     if (field === 'quantity' || field === 'price') {
       const quantity = parseFloat(newItems[index].quantity) || 0;
       const price = parseFloat(newItems[index].price) || 0;
-      
       const itemAmount = quantity * price;
       newItems[index].amount = itemAmount.toFixed(2);
-      
-      console.log(`Calculated amount for item ${index}: ${quantity} × ${price} = ${itemAmount.toFixed(2)}`);
     }
-    
-    // Update form data with new items
+
     setFormData(prev => ({
       ...prev,
       items: newItems
     }));
     
-    // Recalculate overall totals
     calculateTotals(newItems);
   };
 
-  // Calculate totals from items
-  const calculateTotals = (items) => {
-    const subtotal = items.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-    const cgst = subtotal * 0.09; // 9% CGST
-    const sgst = subtotal * 0.09; // 9% SGST
-    const total = subtotal + cgst + sgst;
-    
+  // Toggle tax inclusive
+  const handleTaxInclusiveChange = (checked) => {
+    setFormData(prev => {
+      const next = { ...prev, taxInclusive: checked };
+      calculateTotals(next.items, checked);
+      return next;
+    });
+  };
+
+  // Totals (inclusive/exclusive)
+  const calculateTotals = (items, taxInclusiveFlag = formData.taxInclusive) => {
+    const subtotalRaw = items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+    const totalTaxRate = 0.18; // 18% GST total
+    const halfTaxRate = 0.09;  // 9% each for CGST/SGST
+
+    let cgst, sgst, total, displaySubtotal;
+
+    if (taxInclusiveFlag) {
+      // Prices include taxes: extract tax portions but keep total == subtotalRaw
+      cgst = (subtotalRaw * halfTaxRate) / (1 + totalTaxRate);
+      sgst = (subtotalRaw * halfTaxRate) / (1 + totalTaxRate);
+      displaySubtotal = subtotalRaw;
+      total = subtotalRaw;
+    } else {
+      // Prices exclude taxes: add on top
+      cgst = subtotalRaw * halfTaxRate;
+      sgst = subtotalRaw * halfTaxRate;
+      displaySubtotal = subtotalRaw;
+      total = subtotalRaw + cgst + sgst;
+    }
+
     setFormData(prev => ({
       ...prev,
-      subtotal: subtotal.toFixed(2),
+      subtotal: displaySubtotal.toFixed(2),
       cgst: cgst.toFixed(2),
       sgst: sgst.toFixed(2),
       total: total.toFixed(2)
     }));
   };
 
-  // Add new item row
+  // Add / remove item rows
   const addItemRow = () => {
     const newItem = {
-      id: Date.now().toString(), // Use timestamp as unique ID for reliable tracking
-        description: '', 
-        quantity: 1, 
+      id: Date.now().toString(),
+      description: '',
+      quantity: 1,
       price: 0,
       amount: 0
     };
-    
     const newItems = [...formData.items, newItem];
-    
-    setFormData(prev => ({
-      ...prev,
-      items: newItems
-    }));
+    setFormData(prev => ({ ...prev, items: newItems }));
   };
 
-  // Remove item row
   const removeItemRow = (index) => {
     if (formData.items.length > 1) {
-      // Create a new array without the item at the specified index
       const newItems = [...formData.items];
-      newItems.splice(index, 1); // Properly remove the item at index
-      
-      // Update state with new items array
-      setFormData(prev => ({
-        ...prev,
-        items: newItems
-      }));
-      
-      // Recalculate totals after updating items
+      newItems.splice(index, 1);
+      setFormData(prev => ({ ...prev, items: newItems }));
       calculateTotals(newItems);
     }
   };
 
-  // Handle form submission
+  // Submit -> show preview
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Enhanced validation
-    // Check customer info
+
     if (!formData.customerInfo.name || !formData.customerInfo.email) {
       alert('Please fill in customer name and email');
       return;
     }
-    
-    // Check invoice items
+
     const emptyItems = formData.items.filter(item => !item.description || !item.price);
     if (emptyItems.length > 0) {
       alert('Please fill in all item details (description and price are required)');
       return;
     }
-    
-    // Check for invoice date
+
     if (!formData.invoiceDate) {
       alert('Please provide an invoice date');
       return;
     }
-    
-    // Validate invoice number format
+
     const invoiceNumber = formData.invoiceNumber;
     if (!invoiceNumber) {
       alert('Please provide an invoice number');
       return;
     }
-    
-    // Ensure invoice number starts with INV and has a numeric part
+
     if (!invoiceNumber.startsWith('INV') || !/\d+/.test(invoiceNumber)) {
       alert('Invoice number must start with "INV" followed by numbers (e.g., INV0001)');
       return;
     }
-    
-    console.log('Invoice form submitted:', formData);
-    
-    // Show invoice preview
+
     setShowInvoicePreview(true);
   };
-  
-  // Navigate back to invoice form
-  const handleBackToForm = () => {
-    setShowInvoicePreview(false);
-  };
-  
-  // Navigate back to a blank invoice form (after saving)
+
+  const handleBackToForm = () => setShowInvoicePreview(false);
+
   const handleBackToNewForm = () => {
-    // Calculate date information for new invoice
     const today = new Date();
     const formattedDate = formatDate(today);
-    
-    // Set due date 7 days from now
     const dueDate = new Date();
     dueDate.setDate(today.getDate() + 7);
     const formattedDueDate = formatDate(dueDate);
-    
-    // Get the next invoice ID from localStorage
+
     let nextId = 1;
     try {
       const storedNextId = localStorage.getItem('next_invoice_id');
       if (storedNextId) {
         const parsedId = parseInt(storedNextId);
-        if (!isNaN(parsedId) && parsedId >= 1) {
-          nextId = parsedId;
-        }
+        if (!isNaN(parsedId) && parsedId >= 1) nextId = parsedId;
       }
     } catch (error) {
       console.error("Error getting next invoice ID:", error);
     }
-    
-    // Format invoice number based on ID (e.g., INV0001)
+
     const formattedInvoiceNumber = `INV${nextId.toString().padStart(4, '0')}`;
-    
-    // Reset form data for a new invoice
+
     setFormData({
       invoiceType: 'Invoice',
       status: 'Open',
@@ -366,28 +357,23 @@ const InvoiceCreate = () => {
       cgst: '0.00',
       sgst: '0.00',
       total: '0.00',
-      nextId: nextId.toString()
+      nextId: nextId.toString(),
+      taxInclusive: false,
     });
-    
-    // Return to form view
+
     setShowInvoicePreview(false);
     setSuccessMessage('');
   };
 
-  // Handle Print Preview
+  // Print preview
   const handlePrintPreview = () => {
     try {
-      // First save the invoice data to ensure it appears in the invoice list
+      // Ensure it also gets into invoice list
       saveInvoiceData();
-      
-      // Get the content of the invoice preview
+
       const printContent = document.getElementById('invoice-preview');
-      if (!printContent) {
-        console.error('Could not find element with id "invoice-preview"');
-        return;
-      }
-      
-      // Create a hidden iframe in the current page instead of opening a new tab
+      if (!printContent) return;
+
       let iframe = document.createElement('iframe');
       iframe.style.visibility = 'hidden';
       iframe.style.position = 'fixed';
@@ -396,60 +382,25 @@ const InvoiceCreate = () => {
       iframe.style.width = '0';
       iframe.style.height = '0';
       iframe.style.border = '0';
-      
-      // Add the iframe to the page
       document.body.appendChild(iframe);
-      
-      // Write the invoice content to the iframe
+
       iframe.contentDocument.write(`
         <!DOCTYPE html>
         <html>
           <head>
             <title>Invoice #${formData.invoiceNumber}</title>
             <style>
-              body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 20px;
-              }
+              body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
               @media print {
-                @page {
-                  size: A4;
-                  margin: 0.5cm;
-                }
-                body {
-                  -webkit-print-color-adjust: exact;
-                  print-color-adjust: exact;
-                }
+                @page { size: A4; margin: 0.5cm; }
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
               }
-              /* Add styles to match the invoice preview */
-              table {
-                width: 100%;
-                border-collapse: collapse;
-              }
-              th, td {
-                padding: 8px;
-              }
-              th {
-                background-color: #051937;
-                color: white;
-              }
-              .invoice-header {
-                display: flex;
-                justify-content: space-between;
-                background: linear-gradient(135deg, #051937, #004d7a);
-                color: white;
-                padding: 20px;
-                margin-bottom: 30px;
-              }
-              .signature-section {
-                text-align: center;
-              }
-              .total-row {
-                background: linear-gradient(135deg, #051937, #004d7a);
-                color: white;
-                font-weight: bold;
-              }
+              table { width: 100%; border-collapse: collapse; }
+              th, td { padding: 8px; }
+              th { background-color: #051937; color: white; }
+              .invoice-header { display: flex; justify-content: space-between; background: linear-gradient(135deg, #051937, #004d7a); color: white; padding: 20px; margin-bottom: 30px; }
+              .signature-section { text-align: center; }
+              .total-row { background: linear-gradient(135deg, #051937, #004d7a); color: white; font-weight: bold; }
             </style>
           </head>
           <body>
@@ -457,87 +408,71 @@ const InvoiceCreate = () => {
           </body>
         </html>
       `);
-      
       iframe.contentDocument.close();
-      
-      // Focus the iframe window for printing
       iframe.focus();
-      
-      // Print after a short delay to ensure content is loaded
+
       setTimeout(() => {
-        // Print the iframe content
         iframe.contentWindow.print();
-        
-        // Remove the iframe after printing is done
-        setTimeout(() => {
-          document.body.removeChild(iframe);
-        }, 500);
+        setTimeout(() => document.body.removeChild(iframe), 500);
       }, 500);
     } catch (error) {
       console.error('Error during print preview:', error);
     }
   };
-  
-  // Helper function to save invoice data
+
+  // Save invoice data to localStorage (for list)
   const saveInvoiceData = () => {
     try {
-      console.log("Starting saveInvoiceData function");
-      
-      // Make sure calculations are up-to-date
-      const subtotal = formData.items.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      const cgst = subtotal * 0.09; // 9% CGST
-      const sgst = subtotal * 0.09; // 9% SGST
-      const total = subtotal + cgst + sgst;
-      
-      // Update formData with latest calculations
+      const items = formData.items;
+      const subtotalRaw = items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+      const totalTaxRate = 0.18;
+      const halfTaxRate = 0.09;
+
+      let cgst, sgst, total, displaySubtotal;
+
+      if (formData.taxInclusive) {
+        cgst = (subtotalRaw * halfTaxRate) / (1 + totalTaxRate);
+        sgst = (subtotalRaw * halfTaxRate) / (1 + totalTaxRate);
+        displaySubtotal = subtotalRaw;
+        total = subtotalRaw;
+      } else {
+        cgst = subtotalRaw * halfTaxRate;
+        sgst = subtotalRaw * halfTaxRate;
+        displaySubtotal = subtotalRaw;
+        total = subtotalRaw + cgst + sgst;
+      }
+
       const updatedFormData = {
         ...formData,
-        subtotal: subtotal.toFixed(2),
+        subtotal: displaySubtotal.toFixed(2),
         cgst: cgst.toFixed(2),
         sgst: sgst.toFixed(2),
         total: total.toFixed(2)
       };
-      
-      // Get existing invoices from localStorage with detailed error handling
+
       let invoices = [];
       try {
         const savedInvoicesString = localStorage.getItem('invoices');
-        console.log("Raw localStorage 'invoices' value:", savedInvoicesString);
-        
         if (savedInvoicesString) {
           const parsedData = JSON.parse(savedInvoicesString);
-          console.log("Parsed invoices from localStorage:", parsedData);
-          
-          // Verify invoices is an array
           if (Array.isArray(parsedData)) {
             invoices = parsedData;
           } else {
-            console.error("Invoices from localStorage is not an array. Resetting to empty array.");
             invoices = [];
-            // Clear the invalid data
             localStorage.removeItem('invoices');
           }
-        } else {
-          console.log("No invoices found in localStorage. Starting with empty array.");
         }
-      } catch (parseError) {
-        console.error("Error parsing invoices from localStorage:", parseError);
-        // If there was an error parsing, reset to empty array
+      } catch {
         invoices = [];
-        // Clear the corrupted data
         localStorage.removeItem('invoices');
       }
-      
-      // Get current ID from form state
+
       const currentId = parseInt(formData.nextId);
-      console.log("Using invoice ID for this invoice:", currentId);
-      
-      // Create a properly formatted invoice object with all required fields
+
       const invoiceToSave = {
         ...updatedFormData,
         id: currentId.toString(),
         createdAt: new Date().toISOString(),
-        // Ensure these fields are properly set for the invoice list
         invoiceNumber: updatedFormData.invoiceNumber,
         invoiceType: updatedFormData.invoiceType,
         status: updatedFormData.status,
@@ -545,11 +480,10 @@ const InvoiceCreate = () => {
         subtotal: updatedFormData.subtotal,
         cgst: updatedFormData.cgst,
         sgst: updatedFormData.sgst,
-        // Make sure customer info is saved
+        taxInclusive: updatedFormData.taxInclusive,
         customerInfo: {
           ...updatedFormData.customerInfo
         },
-        // Make sure items are saved with all their properties
         items: updatedFormData.items.map(item => ({
           id: item.id,
           description: item.description,
@@ -558,107 +492,70 @@ const InvoiceCreate = () => {
           amount: item.amount
         }))
       };
-      
-      console.log("Invoice to save:", invoiceToSave);
-      console.log("Number of existing invoices before update:", invoices.length);
-      
-      // We'll add the new invoice to the array unless it's a duplicate invoice number
+
       let shouldAddInvoice = true;
-      
-      // Check if this invoice number already exists (for updating existing invoices)
-      const existingIndex = invoices.findIndex(inv => 
-        inv.invoiceNumber === updatedFormData.invoiceNumber
-      );
-      
-      // Create a new array of invoices to save
+      const existingIndex = invoices.findIndex(inv => inv.invoiceNumber === updatedFormData.invoiceNumber);
       let updatedInvoices = [...invoices];
-      
+
       if (existingIndex >= 0) {
-        console.log(`Found existing invoice with same invoice number at index ${existingIndex}`);
-        
-        // Ask user if they want to update or create new
-        if (window.confirm(`Invoice number ${updatedFormData.invoiceNumber} already exists. Would you like to update it? Click Cancel to create a new invoice instead.`)) {
-          console.log(`Updating existing invoice at index ${existingIndex}`);
-          // Update existing invoice but keep the original ID
+        if (window.confirm(`Invoice number ${updatedFormData.invoiceNumber} already exists. Update it? Click Cancel to create a new invoice instead.`)) {
           updatedInvoices[existingIndex] = {
             ...invoiceToSave,
-            id: invoices[existingIndex].id, // Keep the original ID
+            id: invoices[existingIndex].id,
             updatedAt: new Date().toISOString()
           };
           shouldAddInvoice = false;
         } else {
-          // User chose to create new, so we'll continue with adding
-          console.log("User chose to create a new invoice instead of updating");
           shouldAddInvoice = true;
         }
       }
-      
+
       if (shouldAddInvoice) {
-        console.log("Adding new invoice to the array");
-        // This is a new invoice
         updatedInvoices.push(invoiceToSave);
-        
-        // Increment next_invoice_id in localStorage
         const nextId = currentId + 1;
         localStorage.setItem('next_invoice_id', nextId.toString());
-        console.log("Updated next_invoice_id to:", nextId);
       }
-      
-      console.log("Number of invoices after update:", updatedInvoices.length);
-      
-      // Triple-check the updated array is valid
-      if (!Array.isArray(updatedInvoices)) {
-        console.error("Updated invoices is not an array!");
-        throw new Error("Invoice array is invalid");
-      }
-      
-      // Save to localStorage - use a completely separate variable to avoid any reference issues
-      const invoicesToStore = JSON.stringify(updatedInvoices);
-      localStorage.setItem('invoices', invoicesToStore);
-      console.log("Saved invoices to localStorage:", updatedInvoices);
-      
+
+      localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
       return invoiceToSave;
     } catch (error) {
       console.error("Error in saveInvoiceData:", error);
-      // Show error message to user
       alert(`Error saving invoice: ${error.message}`);
       return null;
     }
   };
 
-  // Handle Save and PDF Download
+  // ===============================
+  // SAVE button -> make + upload PDF
+  // ===============================
   const handleSaveAndDownload = async () => {
     try {
       setIsGeneratingPdf(true);
-      setSuccessMessage(''); // Clear any previous success message
-      
-      // Save the invoice data first
+      setSuccessMessage('');
+
+      // 1) Save locally (so it shows in invoice list)
       const invoiceToSave = saveInvoiceData();
-      
-      // If invoice saving failed, stop the process
       if (!invoiceToSave) {
         setIsGeneratingPdf(false);
         setSuccessMessage('Failed to save invoice. Please try again.');
         return;
       }
-      
-      // Then generate and download PDF
+
+      // 2) Render the preview DOM to canvas
       const invoiceElement = document.getElementById('invoice-preview');
       if (!invoiceElement) {
-        console.error('Could not find element with id "invoice-preview"');
         setSuccessMessage('Error generating PDF. Could not find invoice preview element.');
         setIsGeneratingPdf(false);
         return;
       }
-      
-      // Use html2canvas to render the invoice to a canvas
+
       const canvas = await html2canvas(invoiceElement, {
-        scale: 2, // Higher scale for better quality
-        useCORS: true, // Allow loading external images
+        scale: 2,
+        useCORS: true,
         logging: false
       });
-      
-      // Create PDF from canvas
+
+      // 3) Create PDF and draw the image (IMPORTANT)
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -668,42 +565,58 @@ const InvoiceCreate = () => {
       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
       const imgX = (pdfWidth - imgWidth * ratio) / 2;
       const imgY = 0;
-      
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+
+      // 4) Send PDF + meta to backend
+      const pdfBlob = pdf.output('blob');
+      const payload = {
+        invoiceNumber: invoiceToSave.invoiceNumber,
+        invoiceDate: invoiceToSave.invoiceDate,            // DD/MM/YYYY (raw)
+        invoiceDateISO: toISODate(invoiceToSave.invoiceDate),
+        dueDate: invoiceToSave.dueDate,
+        dueDateISO: toISODate(invoiceToSave.dueDate),
+        customerName: invoiceToSave.customerInfo?.name || '',
+        totalAmount: invoiceToSave.total
+      };
+      const { fileUrl } = await uploadInvoicePdf(pdfBlob, payload);
+
+      // 5) Store fileUrl back to the same record in localStorage so the list can download from server
+      try {
+        const savedStr = localStorage.getItem('invoices');
+        const saved = savedStr ? JSON.parse(savedStr) : [];
+        const idx = saved.findIndex(inv => inv.invoiceNumber === invoiceToSave.invoiceNumber);
+        if (idx !== -1) {
+          saved[idx].pdfUrl = fileUrl;
+          localStorage.setItem('invoices', JSON.stringify(saved));
+        }
+      } catch (_) {
+        // ignore local update errors
+      }
+
+      // 6) Also download locally for user (optional)
       pdf.save(`Invoice_${invoiceToSave.invoiceNumber}.pdf`);
-      
-      // Show success message on the same page
-      setSuccessMessage('Invoice saved and PDF downloaded successfully! Your invoice has been added to the invoice list.');
-      
-      // Get the next invoice ID from localStorage
+
+      // 7) Success + reset form for next invoice
+      setSuccessMessage('Invoice saved to the server and downloaded successfully! It is also added to the invoice list.');
+
       let nextId = 1;
       const storedNextId = localStorage.getItem('next_invoice_id');
       if (storedNextId) {
         const parsedId = parseInt(storedNextId);
-        if (!isNaN(parsedId) && parsedId >= 1) {
-          nextId = parsedId;
-        }
+        if (!isNaN(parsedId) && parsedId >= 1) nextId = parsedId;
       }
-      
-      // Generate invoice number based on next ID (formatted as INV0001)
       const nextInvoiceNumber = `INV${nextId.toString().padStart(4, '0')}`;
-      console.log("Resetting form with next invoice ID:", nextId, "and number:", nextInvoiceNumber);
-      
-      // Get current date for the new invoice
+
       const today = new Date();
       const formattedDate = formatDate(today);
-      
-      // Set due date 7 days from now
-      const dueDate = new Date();
-      dueDate.setDate(today.getDate() + 7);
-      const formattedDueDate = formatDate(dueDate);
-      
-      // Reset to default state but with incremented invoice number - COMPLETELY NEW STATE
+      const due = new Date();
+      due.setDate(today.getDate() + 7);
+      const formattedDueDate = formatDate(due);
+
       setFormData({
-        // Do NOT include any ID field here
         invoiceType: 'Invoice',
         status: 'Open',
-        invoiceNumber: nextInvoiceNumber, // Use the auto-generated invoice number
+        invoiceNumber: nextInvoiceNumber,
         invoiceDate: formattedDate,
         dueDate: formattedDueDate,
         customerInfo: {
@@ -715,48 +628,36 @@ const InvoiceCreate = () => {
           phone: ''
         },
         items: [
-          {
-            id: Date.now().toString(),
-            description: '',
-            quantity: 1,
-            price: 0,
-            amount: 0
-          }
+          { id: Date.now().toString(), description: '', quantity: 1, price: 0, amount: 0 }
         ],
         notes: '',
         subtotal: '0.00',
         cgst: '0.00',
         sgst: '0.00',
         total: '0.00',
-        nextId: nextId.toString() // Set the next ID
+        nextId: nextId.toString(),
+        taxInclusive: false,
       });
-      
-      console.log("Form completely reset for new invoice with number:", nextInvoiceNumber);
-      
-      // Optional: Show a confirmation that we're ready for a new invoice
+
       setTimeout(() => {
         setSuccessMessage(prev => prev + ' You can now create a new invoice.');
       }, 1000);
-      
-      // Stay on the same page (don't navigate away)
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      setSuccessMessage(`Error: ${error.message || 'There was a problem generating the PDF. Please try again.'}`);
+      console.error('Error generating/uploading PDF:', error);
+      setSuccessMessage(`Error: ${error.message || 'There was a problem generating or uploading the PDF.'}`);
     } finally {
       setIsGeneratingPdf(false);
     }
   };
 
-  // Debug function for developers
+  // Debug local invoices
   const debugInvoiceStorage = () => {
     try {
       const savedInvoicesString = localStorage.getItem('invoices');
       if (!savedInvoicesString) {
-        console.log("No invoices in localStorage");
         alert("No invoices found in localStorage");
         return;
       }
-      
       const savedInvoices = JSON.parse(savedInvoicesString);
       console.log("Current invoices in localStorage:", savedInvoices);
       alert(`Found ${savedInvoices.length} invoices in localStorage. Check console for details.`);
@@ -766,7 +667,7 @@ const InvoiceCreate = () => {
     }
   };
 
-  // Handle customer selection
+  // Select existing customer
   const handleSelectCustomer = (customer) => {
     setFormData(prev => ({
       ...prev,
@@ -782,7 +683,6 @@ const InvoiceCreate = () => {
     setShowCustomerModal(false);
   };
 
-  // Filter customers based on search term
   const filteredCustomers = customers.filter(customer => 
     (customer.name && customer.name.toLowerCase().includes(searchTerm.toLowerCase())) || 
     (customer.email && customer.email.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -791,7 +691,6 @@ const InvoiceCreate = () => {
   return (
     <Container fluid>
       {!showInvoicePreview ? (
-        // Invoice Creation Form
         <>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h1 className="mb-0">Create New INVOICE</h1>
@@ -833,10 +732,10 @@ const InvoiceCreate = () => {
               </div>
             </div>
             <div style={{ marginRight: '70px' }}>
-            <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>G1 Akansha Apartment</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>Patel Nagar, City center</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>7000937390</p>
-                <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>infopearl396@gmail.com</p>
+              <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>G1 Akansha Apartment</p>
+              <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>Patel Nagar, City center</p>
+              <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>7000937390</p>
+              <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>infopearl396@gmail.com</p>
             </div>
           </div>
 
@@ -964,7 +863,7 @@ const InvoiceCreate = () => {
                       </Col>
                       <Col md={6}>
                         <Form.Control
-                    type="text"
+                          type="text"
                           placeholder="Town/City"
                           name="town"
                           value={formData.customerInfo.town}
@@ -1003,44 +902,52 @@ const InvoiceCreate = () => {
               <h2 className="mb-3">Item Details</h2>
               <div className="table-responsive">
                 <table className="table table-bordered">
-                <thead>
+                  <thead>
                     <tr>
-                      <th style={{ width: '40%' }}>Description</th>
-                      <th style={{ width: '15%' }}>Quantity</th>
-                      <th style={{ width: '15%' }}>Price (₹)</th>
-                      <th style={{ width: '15%' }}>Amount</th>
-                      <th style={{ width: '15%' }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
+                      <th style={{ width: '34%' }}>Description</th>
+                      <th style={{ width: '13%' }}>Quantity</th>
+                      <th style={{ width: '13%' }}>Price (₹)</th>
+                      <th style={{ width: '13%' }}>Amount</th>
+                      <th style={{ width: '15%' }}>TAX</th>
+                      <th style={{ width: '12%' }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
                     {formData.items.map((item, index) => (
-                    <tr key={item.id}>
-                        <td>
-                          <Form.Control
-                          type="text"
-                          value={item.description}
-                            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                        />
-                      </td>
-                        <td>
-                          <Form.Control
-                          type="number"
-                          value={item.quantity}
-                            min="1"
-                            step="1"
-                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
-                        />
-                      </td>
+                      <tr key={item.id}>
                         <td>
                           <Form.Control
                             type="text"
-                          value={item.price}
+                            value={item.description}
+                            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                          />
+                        </td>
+                        <td>
+                          <Form.Control
+                            type="number"
+                            value={item.quantity}
+                            min="1"
+                            step="1"
+                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                          />
+                        </td>
+                        <td>
+                          <Form.Control
+                            type="text"
+                            value={item.price}
                             onChange={(e) => handleItemChange(index, 'price', e.target.value)}
-                        />
-                      </td>
-                        <td className="text-end">
-                          ₹{item.amount || '0.00'}
-                      </td>
+                          />
+                        </td>
+                        <td className="text-end">₹{item.amount || '0.00'}</td>
+                        <td className="text-center">
+                          <Form.Check
+                            type="checkbox"
+                            id={`tax-inclusive-${item.id}`}
+                            label="Inclusive"
+                            checked={formData.taxInclusive}
+                            onChange={(e) => handleTaxInclusiveChange(e.target.checked)}
+                          />
+                        </td>
                         <td className="text-center">
                           <Button 
                             variant="danger" 
@@ -1049,7 +956,7 @@ const InvoiceCreate = () => {
                             disabled={formData.items.length === 1}
                             aria-label="Delete item"
                             className="delete-btn"
-                          style={{ 
+                            style={{ 
                               width: "32px", 
                               height: "32px", 
                               padding: "0",
@@ -1061,22 +968,18 @@ const InvoiceCreate = () => {
                           >
                             <i className="bi bi-trash-fill"></i>
                           </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
               <Button 
                 variant="success" 
                 onClick={addItemRow}
                 className="mb-4"
-                style={{ 
-                  padding: '8px 16px',
-                  borderRadius: '4px',
-                  fontWeight: '500'
-                }}
+                style={{ padding: '8px 16px', borderRadius: '4px', fontWeight: '500' }}
               >
                 <i className="bi bi-plus-circle me-2"></i>
                 Add Item
@@ -1105,23 +1008,32 @@ const InvoiceCreate = () => {
                         </tr>
                       </tbody>
                     </table>
-                </div>
+                  </div>
+                  {/* Optional global switch outside table
+                  <Form.Check
+                    type="switch"
+                    id="tax-inclusive-switch"
+                    label="Prices are tax-inclusive"
+                    checked={formData.taxInclusive}
+                    onChange={(e) => handleTaxInclusiveChange(e.target.checked)}
+                  />
+                  */}
                 </div>
               </div>
             </div>
 
             <div className="d-grid mb-5">
               <Button 
-              type="submit" 
+                type="submit" 
                 size="lg"
-              style={{ 
-                  background: 'linear-gradient(to right, #3f51b5, #7b1fa2)', //color change
-                border: 'none', 
+                style={{ 
+                  background: 'linear-gradient(to right, #3f51b5, #7b1fa2)',
+                  border: 'none', 
                   width: '40%',
                   margin: '0 auto'
-              }}
-            >
-              Generate Invoice
+                }}
+              >
+                Generate Invoice
               </Button>
             </div>
           </Form>
@@ -1185,7 +1097,9 @@ const InvoiceCreate = () => {
           </Modal>
         </>
       ) : (
-        // Invoice Preview
+        // ==================
+        // Invoice Preview UI
+        // ==================
         <div className="invoice-preview-container">
           {successMessage && (
             <Alert 
@@ -1262,7 +1176,7 @@ const InvoiceCreate = () => {
               border: '1px solid #ddd'
             }}
           >
-            {/* Invoice Header */}
+            {/* Header */}
             <div style={{ 
               display: 'flex',
               justifyContent: 'space-between',
@@ -1272,41 +1186,36 @@ const InvoiceCreate = () => {
               padding: '20px',
               marginBottom: '30px',
               borderBottom: '2px solid #004d7a',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <img 
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <img 
                   src={logo} 
                   alt="Company Logo" 
-                  style={{ 
-                    height: '80px', 
-                    backgroundColor: '#fff',
-                    padding: '5px',
-                    marginRight: '15px',
-                }} 
-              />
-              <div>
+                  style={{ height: '80px', backgroundColor: '#fff', padding: '5px', marginRight: '15px' }} 
+                />
+                <div>
                   <h2 style={{ margin: '0', fontWeight: 'bold', fontSize: '18px' }}>Infopearl Tech Solutions Pvt Ltd</h2>
                   <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>www.infopearl.in</p>
+                </div>
+              </div>
+              <div style={{ marginRight: '50px' }}>
+                <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>G1 Akansha Apartment</p>
+                <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>Patel Nagar, City center</p>
+                <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>7000937390</p>
+                <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>infopearl396@gmail.com</p>
               </div>
             </div>
-              <div style={{ marginRight: '50px' }}>
-              <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>G1 Akansha Apartment</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>Patel Nagar, City center</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>7000937390</p>
-                  <p style={{ margin: '3px 0', textAlign: 'left', fontSize: '12px' }}>infopearl396@gmail.com</p>
-            </div>
-          </div>
 
             {/* Invoice & Customer Info */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
               <div style={{ width: '40%' }}>
-                <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold', color: '#051937',textAlign: 'left' }}>BILL TO</h3>
-                <p style={{ margin: '0 0 5px 0',textAlign: 'left', fontSize: '16px', fontWeight: 'bold' }}>{formData.customerInfo.name || 'Customer Name'}</p>
-                <p style={{ margin: '0 0 5px 0',textAlign: 'left', }}>{formData.customerInfo.address1 || 'Address'}</p>
-                <p style={{ margin: '0 0 5px 0',textAlign: 'left', }}>{formData.customerInfo.town || 'Town/City'}</p>
-                <p style={{ margin: '0 0 5px 0',textAlign: 'left', }}>{formData.customerInfo.country || 'Country'}</p>
-                <p style={{ margin: '0 0 5px 0',textAlign: 'left', }}>{formData.customerInfo.phone || 'Phone'}</p>
-                <p style={{ margin: '0 0 5px 0',textAlign: 'left', }}>{formData.customerInfo.email || 'Email'}</p>
+                <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold', color: '#051937', textAlign: 'left' }}>BILL TO</h3>
+                <p style={{ margin: '0 0 5px 0', textAlign: 'left', fontSize: '16px', fontWeight: 'bold' }}>{formData.customerInfo.name || 'Customer Name'}</p>
+                <p style={{ margin: '0 0 5px 0', textAlign: 'left' }}>{formData.customerInfo.address1 || 'Address'}</p>
+                <p style={{ margin: '0 0 5px 0', textAlign: 'left' }}>{formData.customerInfo.town || 'Town/City'}</p>
+                <p style={{ margin: '0 0 5px 0', textAlign: 'left' }}>{formData.customerInfo.country || 'Country'}</p>
+                <p style={{ margin: '0 0 5px 0', textAlign: 'left' }}>{formData.customerInfo.phone || 'Phone'}</p>
+                <p style={{ margin: '0 0 5px 0', textAlign: 'left' }}>{formData.customerInfo.email || 'Email'}</p>
               </div>
               <div style={{ width: '40%', textAlign: 'right' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
@@ -1324,14 +1233,8 @@ const InvoiceCreate = () => {
               </div>
             </div>
 
-            {/* Invoice Items Table */}
-            <table style={{ 
-              width: '100%', 
-              borderCollapse: 'collapse', 
-              marginBottom: '30px',
-              fontSize: '14px'
-              
-            }}>
+            {/* Items table */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px', fontSize: '14px' }}>
               <thead>
                 <tr style={{ background: 'white', color: '#051937', border: '1px solid #051937' }}>
                   <th style={{ padding: '10px', textAlign: 'left' }}>DESCRIPTION</th>
@@ -1342,43 +1245,25 @@ const InvoiceCreate = () => {
               </thead>
               <tbody>
                 {formData.items.map((item, index) => (
-                  <tr key={index} style={{ 
-                    backgroundColor: index % 2 === 0 ? '#f8f9fa' : '#fff',
-                    borderBottom: '1px solid #ddd'
-                  }}>
+                  <tr key={index} style={{ backgroundColor: index % 2 === 0 ? '#f8f9fa' : '#fff', borderBottom: '1px solid #ddd' }}>
                     <td style={{ padding: '10px', textAlign: 'left' }}>{item.description}</td>
                     <td style={{ padding: '10px', textAlign: 'center' }}>{item.quantity}</td>
-                    <td style={{ padding: '10px', textAlign: 'right' }}>₹{parseFloat(item.price).toFixed(2)}</td>
+                    <td style={{ padding: '10px', textAlign: 'right' }}>₹{(parseFloat(item.price) || 0).toFixed(2)}</td>
                     <td style={{ padding: '10px', textAlign: 'right' }}>₹{item.amount}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            {/* Totals & Signature */}
+            {/* Totals & Sign */}
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <div style={{ width: '40%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <img 
                   src={signature} 
                   alt="Authorized Signature" 
-                  style={{ 
-                    height: '60px',
-                    marginBottom: '10px',
-                    display: 'block',
-                    marginLeft: 'auto',
-                    marginRight: 'auto'
-                  }} 
+                  style={{ height: '60px', marginBottom: '10px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }} 
                 />
-
-                <p style={{ 
-                  margin: '0', 
-                  borderTop: '1px solid #000', 
-                  paddingTop: '5px', 
-                  fontSize: '14px', 
-                  fontWeight: 'bold',
-                  width: '200px',
-                  textAlign: 'center'
-                }}>
+                <p style={{ margin: '0', borderTop: '1px solid #000', paddingTop: '5px', fontSize: '14px', fontWeight: 'bold', width: '200px', textAlign: 'center' }}>
                   Authorized Signature
                 </p>
               </div>
@@ -1387,7 +1272,7 @@ const InvoiceCreate = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                   <p style={{ margin: '0', fontWeight: 'bold', color: '#051937' }}>SUBTOTAL</p>
                   <p style={{ margin: '0' }}>₹{formData.subtotal}</p>
-              </div>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                   <p style={{ margin: '0', fontWeight: 'bold', color: '#051937' }}>CGST (9%)</p>
                   <p style={{ margin: '0' }}>₹{formData.cgst}</p>
@@ -1396,18 +1281,37 @@ const InvoiceCreate = () => {
                   <p style={{ margin: '0', fontWeight: 'bold', color: '#051937' }}>SGST (9%)</p>
                   <p style={{ margin: '0' }}>₹{formData.sgst}</p>
                 </div>
-                <div style={{ 
-                      display: 'flex',
-                      justifyContent: 'space-between', 
-                      background: 'white',
-                      color: '#051937',
-                      padding: '10px',
-                      fontWeight: 'bold',
-                      border: '1px solid #051937',
-                }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', background: 'white', color: '#051937', padding: '10px', fontWeight: 'bold', border: '1px solid #051937' }}>
                   <p style={{ margin: '0' }}>TOTAL</p>
                   <p style={{ margin: '0' }}>₹{formData.total}</p>
                 </div>
+                {formData.taxInclusive && (
+                  <div style={{ marginTop: '6px', fontSize: '12px', color: '#555', textAlign: 'right' }}>
+                    (Prices are tax-inclusive)
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              borderTop: '2px solid #004d7a',
+              marginTop: '50px',
+              paddingTop: '18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '24px',
+              flexWrap: 'wrap',
+            }}>
+              <div style={{ flex: 1, minWidth: '220px' }}>
+                <div style={{ fontWeight: 'bold', fontSize: '1rem', color: '#004d7a' }}>CIN: U72100MP2025PTC074945 </div>
+                <div style={{ fontSize: '0.98rem', color: '#222' }}>infopearl396@gmail.com</div>
+                <div style={{ fontSize: '0.98rem', color: '#222' }}>G1 Akansha Apartment, Patel Nagar, City center</div>
+                <div style={{ fontSize: '0.98rem', color: '#222' }}>Gwalior, M.P</div>
+              </div>
+              <div style={{ flex: 'none', background: '#fff', padding: '8px', borderRadius: '8px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <QRCode value="https://www.infopearl.in" size={70} bgColor="#fff" fgColor="#004d7a" />
               </div>
             </div>
           </div>

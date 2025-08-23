@@ -22,16 +22,40 @@ const SalarySlip = () => {
   const slipRef = useRef(null);
 
   // State for form data
+  // const [formData, setFormData] = useState({
+  //   employeeId: 'EMP001',
+  //   employeeName: '',
+  //   designation: '',
+  //   department: '',
+  //   payPeriod: '',  // New field
+  //   paidDays: '',   // New field
+  //   lossOfPayDays: '',  // New field
+  //   payDate: '',    // New field
+  //   companyInfo: {
+  //     name: 'Infopearl Tech Solutions Pvt Ltd',
+  //     address1: 'G1 Akansha Apartment',
+  //     address2: 'Patel Nagar, City center',
+  //     phone: '7000937390',
+  //     email: 'infopearl396@gmail.com',
+  //     website: 'www.infopearl.in'
+  //   },
+  //   additionalFields: [],  // For custom fields added by the user
+  //   earnings: [/* ... */],
+  //   deductions: [/* ... */],
+  //   totalEarnings: '0.00',
+  //   totalDeductions: '0.00',
+  //   netSalary: '0.00',
+  // });
+  
   const [formData, setFormData] = useState({
     employeeId: 'EMP001',
     employeeName: '',
     designation: '',
     department: '',
-    month: '',
-    year: new Date().getFullYear().toString(),
-    bankAccount: '',
-    bankName: '',
-    panNumber: '',
+    payPeriod: '',  // New field
+    paidDays: '',   // New field
+    lossOfPayDays: '',  // New field
+    payDate: '',    // New field
     joiningDate: '',
     companyInfo: {
       name: 'Infopearl Tech Solutions Pvt Ltd',
@@ -52,11 +76,6 @@ const SalarySlip = () => {
         description: 'HRA',
         amount: 0
       },
-      {
-        id: Date.now().toString() + 2,
-        description: 'Conveyance Allowance',
-        amount: 0
-      }
     ],
     deductions: [
       
@@ -147,6 +166,24 @@ const SalarySlip = () => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+  };
+
+  // Function to add a new custom field
+  const handleAddField = () => {
+    setFormData(prev => ({
+      ...prev,
+      additionalFields: [...prev.additionalFields, { name: '', value: '' }]
+    }));
+  };
+
+  // Function to handle changes to the custom field
+  const handleCustomFieldChange = (index, field, value) => {
+    const updatedFields = [...formData.additionalFields];
+    updatedFields[index][field] = value;
+    setFormData(prev => ({
+      ...prev,
+      additionalFields: updatedFields
+    }));
   };
 
   // Handle input changes for basic fields
@@ -636,8 +673,42 @@ const SalarySlip = () => {
     }
   };
 
+  function numberToWords(num) {
+    const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+    const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    const units = ["", "thousand", "million", "billion"];
+  
+    if (num === 0) return "zero";
+  
+    function convertBelowThousand(n) {
+      if (n < 20) return ones[n];
+      if (n < 100) {
+        return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? "-" + ones[n % 10] : "");
+      }
+      return ones[Math.floor(n / 100)] + " hundred" + (n % 100 !== 0 ? " and " + convertBelowThousand(n % 100) : "");
+    }
+  
+    let words = "";
+    let i = 0;
+    while (num > 0) {
+      if (num % 1000 !== 0) {
+        words = convertBelowThousand(num % 1000) + " " + units[i] + " " + words;
+      }
+      num = Math.floor(num / 1000);
+      i++;
+    }
+    return words.trim();
+  }
+  
+  // Example usage:
+  console.log(numberToWords(123));     // "one hundred and twenty-three"
+  console.log(numberToWords(1500));    // "one thousand five hundred"
+  console.log(numberToWords(1234567)); // "one million two hundred thirty-four thousand five hundred sixty-seven"
+  
+
   return (
     <Container fluid>
+      <h1 className="mb-4">Create Salary Slip</h1>
       {!showSalarySlipPreview ? (
         // Salary Slip Creation Form
         <>
@@ -680,8 +751,6 @@ const SalarySlip = () => {
                 <p style={{ margin: '5px 0', textAlign: 'left', fontSize: '14px' }}>infopearl396@gmail.com</p>
             </div>
           </div>
-
-          <h1 className="mb-4">Create Salary Slip</h1>
           
           <Form onSubmit={handleSubmit}>
             {/* Employee Information */}
@@ -693,7 +762,7 @@ const SalarySlip = () => {
                 <Row className="mb-3">
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>Employee ID</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>Employee ID</Form.Label>
                       <Form.Control
                         type="text"
                         name="employeeId"
@@ -708,7 +777,7 @@ const SalarySlip = () => {
                   </Col>
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>Employee Name</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>Employee Name</Form.Label>
                       <Form.Control
                         type="text"
                         name="employeeName"
@@ -720,7 +789,7 @@ const SalarySlip = () => {
                   </Col>
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>Designation</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>Designation</Form.Label>
                       <Form.Control
                         type="text"
                         name="designation"
@@ -734,7 +803,7 @@ const SalarySlip = () => {
                 <Row className="mb-3">
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>Department</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>Department</Form.Label>
                       <Form.Control
                         type="text"
                         name="department"
@@ -745,7 +814,7 @@ const SalarySlip = () => {
                   </Col>
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>Joining Date</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>Joining Date</Form.Label>
                       <Form.Control
                         type="date"
                         name="joiningDate"
@@ -756,12 +825,13 @@ const SalarySlip = () => {
                   </Col>
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>PAN Number</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>Pay Period</Form.Label>
                       <Form.Control
                         type="text"
-                        name="panNumber"
-                        value={formData.panNumber}
+                        name="payPeriod"
+                        value={formData.payPeriod}
                         onChange={handleChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -770,64 +840,76 @@ const SalarySlip = () => {
                 <Row className="mb-3">
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>Bank Name</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>Paid Days</Form.Label>
                       <Form.Control
-                        type="text"
-                        name="bankName"
-                        value={formData.bankName}
+                        type="number"
+                        name="paidDays"
+                        value={formData.paidDays}
+                        onChange={handleChange}
+                        required
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                    <Form.Group>
+                      <Form.Label style={{ color: 'black' }}>Loss of Pay Days</Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="lossOfPayDays"
+                        value={formData.lossOfPayDays}
                         onChange={handleChange}
                       />
                     </Form.Group>
                   </Col>
                   <Col md={4}>
                     <Form.Group>
-                      <Form.Label>Bank Account</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>Pay Date</Form.Label>
                       <Form.Control
-                        type="text"
-                        name="bankAccount"
-                        value={formData.bankAccount}
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col md={2}>
-                    <Form.Group>
-                      <Form.Label>Month</Form.Label>
-                      <Form.Select
-                        name="month"
-                        value={formData.month}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">Select Month</option>
-                        <option value="January">January</option>
-                        <option value="February">February</option>
-                        <option value="March">March</option>
-                        <option value="April">April</option>
-                        <option value="May">May</option>
-                        <option value="June">June</option>
-                        <option value="July">July</option>
-                        <option value="August">August</option>
-                        <option value="September">September</option>
-                        <option value="October">October</option>
-                        <option value="November">November</option>
-                        <option value="December">December</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-                  <Col md={2}>
-                    <Form.Group>
-                      <Form.Label>Year</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="year"
-                        value={formData.year}
+                        type="date"
+                        name="payDate"
+                        value={formData.payDate}
                         onChange={handleChange}
                         required
                       />
                     </Form.Group>
                   </Col>
                 </Row>
+
+                {/* Add Custom Fields Button */}
+                {/* <Button variant="secondary" onClick={handleAddField}>
+                  Add Custom Field
+                </Button> */}
+
+                {/* Render Custom Fields */}
+                {/* {formData.additionalFields.map((field, index) => (
+                  <Row key={index} className="mb-3">
+                    <Col md={4}>
+                      <Form.Group>
+                        <Form.Label style={{ color: 'black' }}>Field Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name={`customFieldName${index}`}
+                          value={field.name}
+                          onChange={(e) => handleCustomFieldChange(index, 'name', e.target.value)}
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md={4}>
+                      <Form.Group>
+                        <Form.Label style={{ color: 'black' }}>Field Value</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name={`customFieldValue${index}`}
+                          value={field.value}
+                          onChange={(e) => handleCustomFieldChange(index, 'value', e.target.value)}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                )
+              )
+              } */}
+
               </Card.Body>
             </Card>
 
@@ -1224,20 +1306,20 @@ const SalarySlip = () => {
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <tbody>
                       <tr>
-                        <td style={{ padding: '5px 0', fontWeight: 'bold', width: '150px' }}>PAN Number:</td>
-                        <td style={{ padding: '5px 0' }}>{formData.panNumber}</td>
+                        <td style={{ padding: '5px 0', fontWeight: 'bold', width: '150px' }}>Pay Period:</td>
+                        <td style={{ padding: '5px 0' }}>{formData.payPeriod}</td>
                       </tr>
                       <tr>
-                        <td style={{ padding: '5px 0', fontWeight: 'bold' }}>Bank Name:</td>
-                        <td style={{ padding: '5px 0' }}>{formData.bankName}</td>
+                        <td style={{ padding: '5px 0', fontWeight: 'bold' }}>Paid Days:</td>
+                        <td style={{ padding: '5px 0' }}>{formData.paidDays}</td>
                       </tr>
                       <tr>
-                        <td style={{ padding: '5px 0', fontWeight: 'bold' }}>Bank Account:</td>
-                        <td style={{ padding: '5px 0' }}>{formData.bankAccount}</td>
+                        <td style={{ padding: '5px 0', fontWeight: 'bold' }}>LOP Days:</td>
+                        <td style={{ padding: '5px 0' }}>{formData.lossOfPayDays}</td>
                       </tr>
                       <tr>
-                        <td style={{ padding: '5px 0', fontWeight: 'bold' }}>Joining Date:</td>
-                        <td style={{ padding: '5px 0' }}>{formData.joiningDate}</td>
+                        <td style={{ padding: '5px 0', fontWeight: 'bold' }}>Pay Date:</td>
+                        <td style={{ padding: '5px 0' }}>{formData.payDate}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1333,8 +1415,33 @@ const SalarySlip = () => {
               border: '1px solid #051937',
               borderRadius: '4px'
             }}>
-              <span>NET SALARY</span>
+              <span>Net Salary</span>
               <span>₹{formData.netSalary}</span>
+              {/* <br />
+              <span className="text-end fw-bold">
+                ₹{formData.netSalary} ({numberToWords(parseInt(formData.netSalary))} Rupees)
+              </span> */}
+            </div>
+
+            <div style={{ 
+              width: '80%', 
+              margin: '0 auto 30px auto',
+              background: 'white',
+              color: '#051937',
+              padding: 'auto',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              // fontWeight: 'bold',
+              fontSize: '18px',
+              border: '1px solid #051937',
+              borderRadius: '4px'
+            }}>
+              {/* <span>NET SALARY</span>
+              <span>₹{formData.netSalary}</span> */}
+              <span className="text-end fw-bold">
+                Net Salary in word: {numberToWords(parseInt(formData.netSalary)).charAt(0).toUpperCase() + numberToWords(parseInt(formData.netSalary)).slice(1)} Rupees
+              </span>
             </div>
 
             {/* Footer and Signature */}

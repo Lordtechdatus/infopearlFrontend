@@ -24,9 +24,10 @@ import './PopModel.css';
 
 // Admin Components & Pages
 import AdminLayout from './admin/AdminLayout';
-import HeaderSettings from './admin/ContentManagement/HeaderSettings';
-import FooterSettings from './admin/ContentManagement/FooterSettings';
+// import HeaderSettings from './admin/ContentManagement/HeaderSettings';
+// import FooterSettings from './admin/ContentManagement/FooterSettings';
 import GallerySettings from './admin/ContentManagement/GallerySettings';
+import AdminPage from './admin/employee/Createpage';
 import InvoiceList from './admin/invoices/InvoiceList';
 import InvoiceCreate from './admin/invoices/InvoiceCreate';
 import InvoiceDownload from './admin/invoices/InvoiceDownload';
@@ -42,10 +43,11 @@ import UserAdd from './admin/users/UserAdd';
 import LogoSettings from './admin/ContentManagement/LogoSettings';
 import ContactMessages from './admin/ContactMessages';
 import LetterCreate from './admin/letters/LetterCreate';
-import LetterDownload from './admin/letters/LetterDownload';
+import LetterDownload from './admin/letters/LetterList';
 
 // Helper Components
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminList from 'admin/employee/list';
 
 const PopupModal = ({ onClose }) => (
   <div
@@ -124,14 +126,16 @@ function App() {
             <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminDashboard />} />
               <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="header" element={<HeaderSettings />} />
-              <Route path="footer" element={<FooterSettings />} />
+              {/* <Route path="header" element={<HeaderSettings />} />
+              <Route path="footer" element={<FooterSettings />} /> */}
               <Route path="logo" element={<LogoSettings />} />
               <Route path="gallery" element={<GallerySettings />} />
               <Route path="contact-messages" element={<ContactMessages />} />
               <Route path="customers" element={<CustomerList />} />
               <Route path="customers/add" element={<CustomerAdd />} />
               <Route path="customers/edit/:id" element={<CustomerEdit />} />
+              <Route path="employee/createpage" element={<AdminPage />} />
+              <Route path="employee" element={<AdminList />} />
               <Route path="invoices" element={<InvoiceList />} />
               <Route path="invoices/create" element={<InvoiceCreate />} />
               <Route path="invoices/download" element={<InvoiceDownload />} />

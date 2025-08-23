@@ -1,32 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, Row, Col, Form, Button, InputGroup, Pagination, Badge, Alert, Modal, Dropdown } from 'react-bootstrap';
-import { Link, useLocation } from 'react-router-dom';
+import { Container, Table, Row, Col, Form, Button, Pagination, Badge, Alert, Modal, Dropdown } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
 import ShowEntries from '../../components/ShowEntries';
 import './InvoiceList.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../styles/pagination.css';
-
-// Add saveAs for file saving
 import { saveAs } from 'file-saver';
+
+// ====== CONFIG ======
+const API_BASE = 'https://backend.infopearl.in'; // adjust if needed
 
 const InvoiceList = () => {
   // State for invoices, initially empty
   const [invoices, setInvoices] = useState([]);
+  const [isServerData, setIsServerData] = useState(false);
+  const [serverTotalPages, setServerTotalPages] = useState(0);
+  const [serverTotalCount, setServerTotalCount] = useState(0);
+
   const location = useLocation();
   
-  // State for tracking if xlsx-populate library is loaded
+  // xlsx-populate loading state
   const [xlsxLoaded, setXlsxLoaded] = useState(false);
 
-  // Function to load the xlsx-populate library dynamically
+  // load xlsx-populate dynamically
   useEffect(() => {
     if (!window.XlsxPopulate) {
-      // Create script elements for dependencies
       const loadJSZip = document.createElement('script');
       loadJSZip.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js';
       loadJSZip.async = true;
       document.body.appendChild(loadJSZip);
       
-      // Load xlsx-populate after JSZip
       loadJSZip.onload = () => {
         const loadXlsxPopulate = document.createElement('script');
         loadXlsxPopulate.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx-populate/1.21.0/xlsx-populate.min.js';
@@ -38,7 +41,6 @@ const InvoiceList = () => {
       setXlsxLoaded(true);
     }
     
-    // Cleanup function to remove scripts on unmount
     return () => {
       const scripts = document.querySelectorAll('script[src*="jszip"], script[src*="xlsx-populate"]');
       scripts.forEach(script => {
@@ -49,253 +51,265 @@ const InvoiceList = () => {
     };
   }, []);
 
-  // Function to load invoices from localStorage
+  // ========= BACKEND LOADER =========
+  const fetchInvoicesFromServer = async (page, limit, search, status = 'all') => {
+    try {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+        status,
+      });
+      if (search && search.trim()) params.append('search', search.trim());
+
+      const res = await fetch(`${API_BASE}/show-invoices.php?${params.toString()}`, {
+        method: 'GET',
+        credentials: 'omit',
+        headers: { 'Accept': 'application/json' },
+      });
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+      const json = await res.json();
+
+      // expect { data: { invoices: [...] }, pagination: { current_page, total_pages, total_count, limit } }
+      const serverInvoices = (json?.data?.invoices || []).map(row => {
+        // Normalize to UI shape
+        const toFloat = (v) => {
+          const n = typeof v === 'string' ? parseFloat(v) : (v || 0);
+          return isNaN(n) ? 0 : n;
+        };
+
+        const invoiceNumber = row.invoice_no || row.id || '';
+        const issueDateFmt  = row.invoice_date_formatted || (row.invoice_date ? formatYmdToDmy(row.invoice_date) : '');
+        const dueDateFmt    = row.due_date_formatted || (row.due_date ? formatYmdToDmy(row.due_date) : '');
+
+        return {
+          id: invoiceNumber || '',                 // display invoice_no in the "Invoice" column
+          invoiceNumber,                           // keep explicit
+          customer: row.customer_name || 'Unknown Customer',
+          email: '',                               // not provided by backend
+          issueDate: issueDateFmt,
+          dueDate: dueDateFmt,
+          type: 'invoice',
+          status: (row.status || 'open').toLowerCase(),
+          amount: toFloat(row.total_amount),
+          tax: 0,                                  // not provided by backend
+          received: toFloat(row.received_amount),  // currently 0 unless you add it server-side
+          pending: toFloat(row.pending_amount),
+          createdAt: row.created_at || '',
+          timestamp: Date.now(),                   // fallback
+          // PDF links from backend
+          pdfUrl: row.pdf_url || null,            // open/view URL
+          pdfDownloadUrl: row.pdf_download_url || null, // proxy "force download" URL
+          pdfFilename: row.pdf_filename || row.invoices_pdf || null
+        };
+      });
+
+      setInvoices(serverInvoices);
+      setIsServerData(true);
+      setServerTotalPages(json?.pagination?.total_pages || 0);
+      setServerTotalCount(json?.pagination?.total_count || 0);
+    } catch (err) {
+      console.error('Failed to load from backend:', err);
+      // fallback to localStorage
+      setIsServerData(false);
+      loadInvoicesFromStorage();
+    }
+  };
+
+  // ========= LOCALSTORAGE FALLBACK =========
   const loadInvoicesFromStorage = () => {
     try {
-      // First, clear any existing invoices to avoid duplicates
       setInvoices([]);
-      
       const savedInvoicesString = localStorage.getItem('invoices');
-      console.log("Raw invoices from localStorage:", savedInvoicesString);
-      
-      if (!savedInvoicesString) {
-        console.log("No invoices found in localStorage");
-        // No need to set mock data - stay with empty array
-        return;
-      }
-      
-      let savedInvoices;
+      if (!savedInvoicesString) return;
+
+      let savedInvoices = [];
       try {
         savedInvoices = JSON.parse(savedInvoicesString);
-        // Validate that it's an array
         if (!Array.isArray(savedInvoices)) {
-          console.error("Retrieved invoices is not an array:", savedInvoices);
-          // Clear invalid data
           localStorage.removeItem('invoices');
           return;
         }
-      } catch (parseError) {
-        console.error("Failed to parse invoices JSON:", parseError);
-        // Clear corrupted data
+      } catch {
         localStorage.removeItem('invoices');
         return;
       }
-      
-      console.log("Number of invoices found:", savedInvoices.length);
-      
-      // Log each invoice ID and number for debugging
-      savedInvoices.forEach((invoice, index) => {
-        console.log(`Invoice ${index + 1}: ID=${invoice.id}, Number=${invoice.invoiceNumber}, Customer=${invoice.customerInfo?.name || 'Unknown'}`);
-      });
-      
-      // If there are saved invoices, use them
+
       if (savedInvoices.length > 0) {
-        // Transform the saved invoices to match the expected format
         const formattedInvoices = savedInvoices.map(invoice => {
-          // Format dates to DD/MM/YYYY
           const formatDate = (dateStr) => {
             if (!dateStr) return '';
             try {
               const date = new Date(dateStr);
               return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-            } catch (e) {
-              console.warn("Could not parse date:", dateStr, e);
-              return dateStr; // Return as is if can't parse
+            } catch {
+              return dateStr;
             }
           };
-          
-          // Get invoice issue date (from invoiceDate or createdAt)
+
           const issueDate = invoice.invoiceDate ? formatDate(invoice.invoiceDate) : 
-                          (invoice.createdAt ? formatDate(invoice.createdAt) : '');
-          
-          // Get due date if available
-          const dueDate = invoice.dueDate ? formatDate(invoice.dueDate) : '';
-          
-          // Normalize the status to lowercase for case-insensitive comparison
+                            (invoice.createdAt ? formatDate(invoice.createdAt) : '');
+          const dueDate   = invoice.dueDate ? formatDate(invoice.dueDate) : '';
           const normalizedStatus = (invoice.status || '').toLowerCase() || 'open';
-          
-          // Calculate totals - handle both tax and cgst/sgst for backward compatibility
           const amount = parseFloat(invoice.total || 0);
           const tax = invoice.tax ? parseFloat(invoice.tax) : 
-                    (invoice.cgst ? parseFloat(invoice.cgst) + parseFloat(invoice.sgst || 0) : 0);
-          
-          // Set received amount based on status
+                      (invoice.cgst ? parseFloat(invoice.cgst) + parseFloat(invoice.sgst || 0) : 0);
           const received = normalizedStatus === 'paid' ? amount : 0;
-          const pending = normalizedStatus === 'paid' ? 0 : amount;
-          
+          const pending  = normalizedStatus === 'paid' ? 0 : amount;
           const customerName = invoice.customerInfo?.name || 'Unknown Customer';
-          
-          console.log(`Processing invoice ${invoice.id || invoice.invoiceNumber}: ${customerName}, amount: ${amount}`);
-          
+
           return {
             id: invoice.id || invoice.invoiceNumber || Date.now().toString(),
             invoiceNumber: invoice.invoiceNumber,
             customer: customerName,
             email: invoice.customerInfo?.email || '',
-            issueDate: issueDate,
-            dueDate: dueDate,
+            issueDate,
+            dueDate,
             type: (invoice.invoiceType || 'invoice').toLowerCase(),
             status: normalizedStatus,
-            amount: amount,
-            tax: tax,
-            received: received,
-            pending: pending,
-            // Store the original createdAt date for sorting
+            amount,
+            tax,
+            received,
+            pending,
             createdAt: invoice.createdAt || '',
-            // Store the timestamp part of the ID for sorting backup
-            timestamp: parseInt(invoice.id) || Date.now()
+            timestamp: parseInt(invoice.id) || Date.now(),
+            pdfUrl: invoice.pdfUrl || null,               // if you stored the server link when creating
+            pdfDownloadUrl: invoice.pdfDownloadUrl || null, // if you stored proxy link locally
+            items: invoice.items || [],
+            subtotal: invoice.subtotal,
+            cgst: invoice.cgst,
+            sgst: invoice.sgst,
+            total: invoice.total,
           };
         });
-        
-        // Sort invoices by createdAt date (newest first), or by ID timestamp if createdAt is not available
+
         const sortedInvoices = formattedInvoices.sort((a, b) => {
-          // If both have createdAt dates, use those
           if (a.createdAt && b.createdAt) {
             return new Date(b.createdAt) - new Date(a.createdAt);
           }
-          // Otherwise fall back to ID-based timestamp
           return b.timestamp - a.timestamp;
         });
-        
-        // Log the sorted invoices for debugging
-        console.log(`Sorted ${sortedInvoices.length} invoices, first invoice: ${sortedInvoices[0]?.customer}, last invoice: ${sortedInvoices[sortedInvoices.length - 1]?.customer}`);
-        
+
         setInvoices(sortedInvoices);
       } else {
-        console.log("No invoices found in saved data");
-        // Keep the array empty - don't use mock data
         setInvoices([]);
       }
     } catch (error) {
       console.error("Error loading invoices from localStorage:", error);
-      // Don't use mock data - just keep the array empty and show the error
       setInvoices([]);
       alert("There was an error loading your invoices. Please check the console for details.");
     }
   };
 
-  // Load invoices from localStorage on component mount
-  useEffect(() => {
-    loadInvoicesFromStorage();
-  }, []);
-
-  // Refresh data when the component is focused (e.g., after navigating back from create/edit)
-  useEffect(() => {
-    loadInvoicesFromStorage();
-  }, [location]);
-
-  // State for entries per page and search term
+  // ====== UI state ======
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [showCsvSuccess, setShowCsvSuccess] = useState(false);
   const [csvDownloadInfo, setCsvDownloadInfo] = useState({ type: '', period: '' });
   
-  // Delete confirmation modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
   
-  // Download confirmation state
   const [downloadInvoiceId, setDownloadInvoiceId] = useState(null);
   const [showDownloadSuccess, setShowDownloadSuccess] = useState(false);
   
-  // Email modal state
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [invoiceToEmail, setInvoiceToEmail] = useState(null);
-  const [emailDetails, setEmailDetails] = useState({
-    to: '',
-    subject: '',
-    message: ''
-  });
+  const [emailDetails, setEmailDetails] = useState({ to: '', subject: '', message: '' });
   const [showEmailSuccess, setShowEmailSuccess] = useState(false);
   
-  // Add view modal state
   const [showViewModal, setShowViewModal] = useState(false);
   const [invoiceToView, setInvoiceToView] = useState(null);
-  
-  // Total number of entries
-  const totalEntries = invoices.length;
-  const totalPages = Math.ceil(totalEntries / entriesPerPage);
-  
-  // Add these two lines:
+
+  // ====== LOAD DATA ======
+  useEffect(() => {
+    // Try server first
+    fetchInvoicesFromServer(currentPage, entriesPerPage, searchTerm, 'all');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, entriesPerPage, searchTerm]);
+
+  useEffect(() => {
+    // When navigating back to this page, refresh from server
+    fetchInvoicesFromServer(currentPage, entriesPerPage, searchTerm, 'all');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
+
+  // ====== PAGINATION HELPERS ======
+  const totalEntries = isServerData ? serverTotalCount : invoices.length;
+  const totalPages = isServerData ? serverTotalPages : Math.ceil(totalEntries / entriesPerPage);
+
   const indexOfLastInvoice = currentPage * entriesPerPage;
   const indexOfFirstInvoice = indexOfLastInvoice - entriesPerPage;
-  
-  // Calculate totals for summary
+
+  // ====== FILTER (local only) ======
+  const localFilteredInvoices = !isServerData ? invoices.filter(invoice => 
+    invoice.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (invoice.invoiceNumber || invoice.id || '').toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+    invoice.status.toLowerCase().includes(searchTerm.toLowerCase())
+  ) : invoices;
+
+  const visibleInvoices = isServerData
+    ? invoices // server already applied search + pagination
+    : localFilteredInvoices.slice(indexOfFirstInvoice, indexOfLastInvoice);
+
+  // ====== SUMMARY TOTALS (over visible set) ======
   const calculateTotals = () => {
     let totalAmount = 0;
     let totalReceived = 0;
     let totalPending = 0;
-    
-    filteredInvoices.forEach(invoice => {
-      totalAmount += invoice.amount;
-      totalReceived += invoice.received;
-      totalPending += invoice.pending;
+    (isServerData ? invoices : localFilteredInvoices).forEach(invoice => {
+      totalAmount += parseFloat(invoice.amount || 0);
+      totalReceived += parseFloat(invoice.received || 0);
+      totalPending += parseFloat(invoice.pending || 0);
     });
-    
     return {
       totalAmount: totalAmount.toFixed(2),
       totalReceived: totalReceived.toFixed(2),
       totalPending: totalPending.toFixed(2)
     };
   };
-  
-  // Filtered invoices based on search term
-  const filteredInvoices = invoices.filter(invoice => 
-    invoice.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.id.toString().includes(searchTerm) ||
-    invoice.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  
-  // Get totals for the current filtered list
   const totals = calculateTotals();
-  
-  // Parse date from DD/MM/YYYY format to Date object
+
+  // ====== DATE/CSV HELPERS ======
   const parseDate = (dateStr) => {
+    if (!dateStr) return new Date('Invalid');
     const [day, month, year] = dateStr.split('/');
     return new Date(year, month - 1, day);
   };
-  
-  // Format date to YYYY-MM format for grouping by month
   const getYearMonth = (dateStr) => {
     const date = parseDate(dateStr);
+    if (isNaN(date)) return '0000-00';
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   };
-  
-  // Format money value
-  const formatMoney = (amount) => {
-    return `${parseFloat(amount).toFixed(2)}`;
-  };
-  
-  // Group invoices by month
-  const getInvoiceMonths = () => {
-    const months = new Set();
-    invoices.forEach(invoice => {
-      months.add(getYearMonth(invoice.issueDate));
-    });
-    
-    // Convert to array, sort in reverse chronological order
-    return Array.from(months).sort().reverse();
-  };
-  
-  // Get invoices for a specific month
-  const getInvoicesForMonth = (yearMonth) => {
-    return invoices.filter(invoice => getYearMonth(invoice.issueDate) === yearMonth);
-  };
-  
-  // Format yearMonth to display name
+  const formatMoney = (amount) => `${parseFloat(amount || 0).toFixed(2)}`;
   const formatMonthDisplay = (yearMonth) => {
     const [year, month] = yearMonth.split('-');
-    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, 1);
     return date.toLocaleString('default', { month: 'long', year: 'numeric' });
   };
-  
-  // Handle page change
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const formatYmdToDmy = (ymd) => {
+    try {
+      const [y,m,d] = ymd.split('-');
+      return `${d}/${m}/${y}`;
+    } catch {
+      return ymd;
+    }
   };
-  
-  // Get status badge
+
+  const getInvoiceMonths = () => {
+    // Based on currently loaded invoices (page-only for server data)
+    const months = new Set();
+    invoices.forEach(inv => {
+      if (inv.issueDate) months.add(getYearMonth(inv.issueDate));
+    });
+    return Array.from(months).sort().reverse();
+  };
+  const getInvoicesForMonth = (yearMonth) => {
+    return invoices.filter(inv => getYearMonth(inv.issueDate) === yearMonth);
+  };
+  const availableMonths = getInvoiceMonths();
+
+  // ====== STATUS BADGE ======
   const getStatusBadge = (status) => {
     switch(status) {
       case 'paid':
@@ -309,156 +323,69 @@ const InvoiceList = () => {
     }
   };
 
-  // Generate and download monthly CSV
+  // ====== CSV DOWNLOADS ======
   const downloadMonthlyCSV = (yearMonth) => {
     const monthlyInvoices = getInvoicesForMonth(yearMonth);
     const monthName = formatMonthDisplay(yearMonth);
-    
-    // Create CSV header
     let csvContent = "Invoice,Customer,Email,Issue Date,Due Date,Total Amount,Received Amount,Pending Amount,Type,Status\n";
-    
-    // Add invoice data
-    monthlyInvoices.forEach(invoice => {
-      csvContent += `${invoice.id},${invoice.customer},${invoice.email},${invoice.issueDate},${invoice.dueDate},${formatMoney(invoice.amount)},${formatMoney(invoice.received)},${formatMoney(invoice.pending)},${invoice.type},${invoice.status}\n`;
+    monthlyInvoices.forEach(inv => {
+      csvContent += `${inv.invoiceNumber || inv.id},${inv.customer},${inv.email || ''},${inv.issueDate},${inv.dueDate},${formatMoney(inv.amount)},${formatMoney(inv.received)},${formatMoney(inv.pending)},${inv.type},${inv.status}\n`;
     });
-    
-    // Create a blob and download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `invoices-${yearMonth}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Show success message
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoices-${yearMonth}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     setCsvDownloadInfo({ type: 'monthly', period: monthName });
     setShowCsvSuccess(true);
-    
-    // Hide message after 5 seconds
-    setTimeout(() => {
-      setShowCsvSuccess(false);
-    }, 5000);
-  };
-  
-  // Generate and download all time CSV
-  const downloadAllTimeCSV = () => {
-    // Create CSV header
-    let csvContent = "Invoice,Customer,Email,Issue Date,Due Date,Total Amount,Received Amount,Pending Amount,Type,Status\n";
-    
-    // Add invoice data
-    invoices.forEach(invoice => {
-      csvContent += `${invoice.id},${invoice.customer},${invoice.email},${invoice.issueDate},${invoice.dueDate},${formatMoney(invoice.amount)},${formatMoney(invoice.received)},${formatMoney(invoice.pending)},${invoice.type},${invoice.status}\n`;
-    });
-    
-    // Create a blob and download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'all-invoices.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    // Show success message
-    setCsvDownloadInfo({ type: 'all-time', period: 'All Time' });
-    setShowCsvSuccess(true);
-    
-    // Hide message after 5 seconds
-    setTimeout(() => {
-      setShowCsvSuccess(false);
-    }, 5000);
+    setTimeout(() => setShowCsvSuccess(false), 5000);
   };
 
-  // Handle downloading a single invoice
-  const handleDownloadInvoice = (invoiceId) => {
+  const downloadAllTimeCSV = () => {
+    let csvContent = "Invoice,Customer,Email,Issue Date,Due Date,Total Amount,Received Amount,Pending Amount,Type,Status\n";
+    invoices.forEach(inv => {
+      csvContent += `${inv.invoiceNumber || inv.id},${inv.customer},${inv.email || ''},${inv.issueDate},${inv.dueDate},${formatMoney(inv.amount)},${formatMoney(inv.received)},${formatMoney(inv.pending)},${inv.type},${inv.status}\n`;
+    });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'all-invoices.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setCsvDownloadInfo({ type: 'all-time', period: 'All Time' });
+    setShowCsvSuccess(true);
+    setTimeout(() => setShowCsvSuccess(false), 5000);
+  };
+
+  // ====== PDF DOWNLOAD (SERVER) + XLSX FALLBACK ======
+  const downloadPdfFromUrl = async (url, filename) => {
     try {
-      // Set the loading state first
-      setDownloadInvoiceId(invoiceId);
-      
-      // Find the invoice in the localStorage data
-      const savedInvoicesString = localStorage.getItem('invoices');
-      if (!savedInvoicesString) {
-        console.error("No invoices found in localStorage");
-        alert("Error: Cannot find invoice data");
-        setDownloadInvoiceId(null);
-        return;
-      }
-      
-      const savedInvoices = JSON.parse(savedInvoicesString);
-      const invoiceToDownload = savedInvoices.find(invoice => invoice.id === invoiceId);
-      
-      if (!invoiceToDownload) {
-        console.error(`Invoice with ID ${invoiceId} not found`);
-        alert("Error: Invoice not found");
-        setDownloadInvoiceId(null);
-        return;
-      }
-      
-      // Check if XlsxPopulate is available
-      if (!window.XlsxPopulate) {
-        console.log("XlsxPopulate not loaded yet, loading dependencies...");
-        
-        // Load JSZip first
-        const loadJSZip = document.createElement('script');
-        loadJSZip.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js';
-        loadJSZip.async = true;
-        document.body.appendChild(loadJSZip);
-        
-        loadJSZip.onload = () => {
-          console.log("JSZip loaded, now loading XlsxPopulate...");
-          // Then load xlsx-populate
-          const loadXlsxPopulate = document.createElement('script');
-          loadXlsxPopulate.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx-populate/1.21.0/xlsx-populate.min.js';
-          loadXlsxPopulate.async = true;
-          
-          loadXlsxPopulate.onload = () => {
-            console.log("XlsxPopulate loaded successfully, continuing download...");
-            // Now that both libraries are loaded, generate the Excel file
-            generateAndDownloadExcel(invoiceToDownload);
-          };
-          
-          loadXlsxPopulate.onerror = (error) => {
-            console.error("Failed to load XlsxPopulate:", error);
-            alert("Error loading Excel generator. Please try again later.");
-            setDownloadInvoiceId(null);
-          };
-          
-          document.body.appendChild(loadXlsxPopulate);
-        };
-        
-        loadJSZip.onerror = (error) => {
-          console.error("Failed to load JSZip:", error);
-          alert("Error loading Excel generator dependencies. Please try again later.");
-          setDownloadInvoiceId(null);
-        };
-      } else {
-        console.log("XlsxPopulate already loaded, generating Excel...");
-        // XlsxPopulate is already loaded, generate Excel
-        generateAndDownloadExcel(invoiceToDownload);
-      }
-    } catch (error) {
-      console.error("Error downloading invoice:", error);
-      alert(`Error downloading invoice: ${error.message}`);
-      setDownloadInvoiceId(null);
+      const res = await fetch(url, { method: 'GET', credentials: 'omit' });
+      if (!res.ok) throw new Error(`Download failed (${res.status})`);
+      const blob = await res.blob();
+      saveAs(blob, filename);
+      return true;
+    } catch (e) {
+      console.error('PDF download error:', e);
+      return false;
     }
   };
-  
-  // Separate function to generate and download Excel
+
+  // older local xlsx fallback expects a full invoice record from localStorage
   const generateAndDownloadExcel = (invoiceToDownload) => {
     try {
-      // Create Excel file data
+      // Minimal protection
+      if (!window.XlsxPopulate || typeof window.XlsxPopulate.Workbook !== 'function') {
+        throw new Error("Excel generation library not properly loaded. Please refresh the page and try again.");
+      }
+
       let excelData = [
-        // Header row with styling
-        [
-          { value: "Invoice Details", fontWeight: 'bold', fontSize: 14, span: 3 }, 
-          null, 
-          null
-        ],
+        [{ value: "Invoice Details", fontWeight: 'bold', fontSize: 14, span: 3 }, null, null],
         [
           { value: "Invoice #:", fontWeight: 'bold' },
           { value: invoiceToDownload.invoiceNumber || invoiceToDownload.id, align: 'left' },
@@ -467,18 +394,17 @@ const InvoiceList = () => {
         ],
         [
           { value: "Customer:", fontWeight: 'bold' },
-          { value: invoiceToDownload.customerInfo?.name || 'Unknown Customer', align: 'left' },
+          { value: invoiceToDownload.customerInfo?.name || invoiceToDownload.customer || 'Unknown Customer', align: 'left' },
           { value: "Due Date:", fontWeight: 'bold' },
           { value: invoiceToDownload.dueDate || '', align: 'left' }
         ],
         [
           { value: "Email:", fontWeight: 'bold' },
-          { value: invoiceToDownload.customerInfo?.email || '', align: 'left' },
+          { value: invoiceToDownload.customerInfo?.email || invoiceToDownload.email || '', align: 'left' },
           { value: "Status:", fontWeight: 'bold' },
-          { value: invoiceToDownload.status || 'Open', align: 'left' }
+          { value: (invoiceToDownload.status || 'Open'), align: 'left' }
         ],
-        [], // Empty row for spacing
-        // Items header
+        [],
         [
           { value: "Description", fontWeight: 'bold', backgroundColor: '#ECECEC' },
           { value: "Quantity", fontWeight: 'bold', backgroundColor: '#ECECEC', align: 'center' },
@@ -486,8 +412,7 @@ const InvoiceList = () => {
           { value: "Amount (₹)", fontWeight: 'bold', backgroundColor: '#ECECEC', align: 'right' }
         ]
       ];
-      
-      // Add items
+
       if (invoiceToDownload.items && invoiceToDownload.items.length > 0) {
         invoiceToDownload.items.forEach(item => {
           excelData.push([
@@ -499,119 +424,48 @@ const InvoiceList = () => {
         });
       } else {
         excelData.push([
-          { value: "No items" },
-          { value: "", align: 'center' },
-          { value: "", align: 'right' },
-          { value: "", align: 'right' }
+          { value: "No items" }, { value: "", align: 'center' }, { value: "", align: 'right' }, { value: "", align: 'right' }
         ]);
       }
-      
-      // Add empty row and totals
-      excelData.push([]);
-      excelData.push([
-        { value: "" },
-        { value: "" },
-        { value: "Subtotal:", fontWeight: 'bold', align: 'right' },
-        { value: invoiceToDownload.subtotal || '0.00', align: 'right' }
-      ]);
-      excelData.push([
-        { value: "" },
-        { value: "" },
-        { value: "CGST (9%):", fontWeight: 'bold', align: 'right' },
-        { value: invoiceToDownload.cgst || '0.00', align: 'right' }
-      ]);
-      excelData.push([
-        { value: "" },
-        { value: "" },
-        { value: "SGST (9%):", fontWeight: 'bold', align: 'right' },
-        { value: invoiceToDownload.sgst || '0.00', align: 'right' }
-      ]);
-      excelData.push([
-        { value: "" },
-        { value: "" },
-        { value: "Total:", fontWeight: 'bold', align: 'right', backgroundColor: '#ECECEC' },
-        { value: invoiceToDownload.total || '0.00', align: 'right', backgroundColor: '#ECECEC', fontWeight: 'bold' }
-      ]);
 
-      // Define column widths
-      const columns = [
-        { width: 40 }, // Description column
-        { width: 10 }, // Quantity column
-        { width: 15 }, // Price column 
-        { width: 15 }  // Amount column
-      ];
-      
-      // Directly check if XlsxPopulate is properly loaded with the Workbook constructor
-      if (!window.XlsxPopulate || typeof window.XlsxPopulate.Workbook !== 'function') {
-        throw new Error("Excel generation library not properly loaded. Please refresh the page and try again.");
-      }
-      
-      // Generate XLSX data using xlsx-populate approach
-      console.log("Creating Excel workbook...");
-      const workbook = window.XlsxPopulate.Workbook.create(); // Using create() static method instead of constructor
+      excelData.push([]);
+      excelData.push([{ value: "" }, { value: "" }, { value: "Subtotal:", fontWeight: 'bold', align: 'right' }, { value: invoiceToDownload.subtotal || '0.00', align: 'right' }]);
+      excelData.push([{ value: "" }, { value: "" }, { value: "CGST (9%):", fontWeight: 'bold', align: 'right' }, { value: invoiceToDownload.cgst || '0.00', align: 'right' }]);
+      excelData.push([{ value: "" }, { value: "" }, { value: "SGST (9%):", fontWeight: 'bold', align: 'right' }, { value: invoiceToDownload.sgst || '0.00', align: 'right' }]);
+      excelData.push([{ value: "" }, { value: "" }, { value: "Total:", fontWeight: 'bold', align: 'right', backgroundColor: '#ECECEC' }, { value: invoiceToDownload.total || '0.00', align: 'right', backgroundColor: '#ECECEC', fontWeight: 'bold' }]);
+
+      const columns = [{ width: 40 }, { width: 10 }, { width: 15 }, { width: 15 }];
+
+      const workbook = window.XlsxPopulate.Workbook.create();
       const sheet = workbook.sheet(0);
-      
-      // Set worksheet name to invoice number
       workbook.sheet(0).name(`Invoice_${invoiceToDownload.invoiceNumber || invoiceToDownload.id}`);
-      
-      // Process each row in our excelData
+
       excelData.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
           if (cell !== null) {
-            // Set value
             const xlsxCell = sheet.cell(rowIndex + 1, colIndex + 1);
             xlsxCell.value(cell.value);
-            
-            // Apply styling
-            if (cell.fontWeight === 'bold') {
-              xlsxCell.style('bold', true);
-            }
-            
-            if (cell.fontSize) {
-              xlsxCell.style('fontSize', cell.fontSize);
-            }
-            
-            if (cell.align === 'right') {
-              xlsxCell.style('horizontalAlignment', 'right');
-            } else if (cell.align === 'center') {
-              xlsxCell.style('horizontalAlignment', 'center');
-            } else if (cell.align === 'left') {
-              xlsxCell.style('horizontalAlignment', 'left');
-            }
-            
-            if (cell.backgroundColor) {
-              xlsxCell.style('fill', cell.backgroundColor);
-            }
-            
-            // Handle column span (merge cells)
+            if (cell.fontWeight === 'bold') xlsxCell.style('bold', true);
+            if (cell.fontSize) xlsxCell.style('fontSize', cell.fontSize);
+            if (cell.align === 'right') xlsxCell.style('horizontalAlignment', 'right');
+            else if (cell.align === 'center') xlsxCell.style('horizontalAlignment', 'center');
+            else if (cell.align === 'left') xlsxCell.style('horizontalAlignment', 'left');
+            if (cell.backgroundColor) xlsxCell.style('fill', cell.backgroundColor);
             if (cell.span && cell.span > 1) {
-              sheet.range(
-                rowIndex + 1, colIndex + 1, 
-                rowIndex + 1, colIndex + cell.span
-              ).merged(true);
+              sheet.range(rowIndex + 1, colIndex + 1, rowIndex + 1, colIndex + cell.span).merged(true);
             }
           }
         });
       });
-      
-      // Set column widths
+
       columns.forEach((column, index) => {
-        if (column.width) {
-          sheet.column(index + 1).width(column.width);
-        }
+        if (column.width) sheet.column(index + 1).width(column.width);
       });
-      
-      // Generate blob and download
-      console.log("Generating Excel file blob...");
+
       workbook.outputAsync()
         .then(blob => {
-          console.log("Excel blob generated, saving file...");
           saveAs(blob, `Invoice_${invoiceToDownload.invoiceNumber || invoiceToDownload.id}.xlsx`);
-          
-          // Show success message
           setShowDownloadSuccess(true);
-          
-          // Hide message after 3 seconds
           setTimeout(() => {
             setShowDownloadSuccess(false);
             setDownloadInvoiceId(null);
@@ -628,81 +482,87 @@ const InvoiceList = () => {
       setDownloadInvoiceId(null);
     }
   };
-  
-  // Show delete confirmation modal
+
+  // Unified handler: prefer server proxy PDF, then direct PDF; fallback to local XLSX
+  const handleDownloadInvoice = async (invoice) => {
+    const invId = invoice.invoiceNumber || invoice.id;
+    setDownloadInvoiceId(invId);
+    try {
+      // 1) Try proxy downloader (download-invoice.php) — best for CORS/headers
+      if (invoice.pdfDownloadUrl) {
+        const ok = await downloadPdfFromUrl(invoice.pdfDownloadUrl, `Invoice_${invId}.pdf`);
+        if (ok) {
+          setShowDownloadSuccess(true);
+          setTimeout(() => {
+            setShowDownloadSuccess(false);
+            setDownloadInvoiceId(null);
+          }, 3000);
+          return;
+        }
+      }
+
+      // 2) Fallback: try public direct file URL
+      if (invoice.pdfUrl) {
+        const ok = await downloadPdfFromUrl(invoice.pdfUrl, `Invoice_${invId}.pdf`);
+        if (ok) {
+          setShowDownloadSuccess(true);
+          setTimeout(() => {
+            setShowDownloadSuccess(false);
+            setDownloadInvoiceId(null);
+          }, 3000);
+          return;
+        }
+      }
+
+      // 3) Last resort: try to find detailed invoice from localStorage to generate XLSX
+      const savedStr = localStorage.getItem('invoices');
+      const saved = savedStr ? JSON.parse(savedStr) : [];
+      const match = saved.find(inv =>
+        inv.invoiceNumber === invoice.invoiceNumber ||
+        inv.invoiceNumber === invoice.id ||
+        inv.id === invoice.invoiceNumber ||
+        inv.id === invoice.id
+      );
+
+      if (match) {
+        generateAndDownloadExcel(match);
+      } else {
+        alert('No server PDF found for this invoice and no detailed data in your browser to generate Excel.');
+        setDownloadInvoiceId(null);
+      }
+    } catch (e) {
+      console.error('Download error:', e);
+      alert(e.message || 'Download failed.');
+      setDownloadInvoiceId(null);
+    }
+  };
+
+  // Delete confirmation modal
   const confirmDelete = (invoice) => {
     setInvoiceToDelete(invoice);
     setShowDeleteModal(true);
   };
-  
-  // Delete invoice
+
+  // Delete invoice (local-only; server delete not implemented here)
   const deleteInvoice = () => {
     if (invoiceToDelete) {
       try {
-        // Remove from state
-        const updatedInvoices = invoices.filter(invoice => invoice.id !== invoiceToDelete.id);
+        const updatedInvoices = invoices.filter(inv => (inv.invoiceNumber || inv.id) !== (invoiceToDelete.invoiceNumber || invoiceToDelete.id));
         setInvoices(updatedInvoices);
-        
-        // Also remove from localStorage
+        // Also clean from localStorage if present
         const savedInvoicesString = localStorage.getItem('invoices');
-        
         if (savedInvoicesString) {
           try {
             const savedInvoices = JSON.parse(savedInvoicesString);
-            
             if (Array.isArray(savedInvoices)) {
-              console.log(`Before deletion: ${savedInvoices.length} invoices`);
-              console.log(`Attempting to delete invoice with ID: ${invoiceToDelete.id}`);
-              
-              // Log all IDs for debugging
-              savedInvoices.forEach((invoice, idx) => {
-                console.log(`Invoice ${idx}: ID=${invoice.id}, Number=${invoice.invoiceNumber}`);
-              });
-              
-              // Find and remove the invoice by ID
-              const updatedSavedInvoices = savedInvoices.filter(invoice => {
-                const keepInvoice = invoice.id !== invoiceToDelete.id;
-                if (!keepInvoice) {
-                  console.log(`Found matching invoice to delete: ${invoice.id} / ${invoice.invoiceNumber}`);
-                }
-                return keepInvoice;
-              });
-              
-              console.log(`After deletion: ${updatedSavedInvoices.length} invoices`);
-              
-              if (savedInvoices.length === updatedSavedInvoices.length) {
-                console.warn("No invoice was removed - ID might not match exactly");
-                // Try with string comparison as fallback
-                const strictUpdatedInvoices = savedInvoices.filter(invoice => 
-                  String(invoice.id) !== String(invoiceToDelete.id)
-                );
-                
-                if (strictUpdatedInvoices.length < savedInvoices.length) {
-                  console.log("Deletion successful with string comparison");
-                  localStorage.setItem('invoices', JSON.stringify(strictUpdatedInvoices));
-                } else {
-                  console.error("Could not find invoice to delete");
-                  alert("Warning: Could not find the exact invoice to delete. The list may be out of sync.");
-                  // Save what we have anyway
-                  localStorage.setItem('invoices', JSON.stringify(updatedSavedInvoices));
-                }
-              } else {
-                // Save the updated array back to localStorage
-                localStorage.setItem('invoices', JSON.stringify(updatedSavedInvoices));
-              }
-            } else {
-              console.error("Saved invoices is not an array:", savedInvoices);
-              // Reset to an empty array
-              localStorage.setItem('invoices', JSON.stringify([]));
+              const strictUpdated = savedInvoices.filter(inv => 
+                String(inv.invoiceNumber) !== String(invoiceToDelete.invoiceNumber || invoiceToDelete.id) &&
+                String(inv.id) !== String(invoiceToDelete.invoiceNumber || invoiceToDelete.id)
+              );
+              localStorage.setItem('invoices', JSON.stringify(strictUpdated));
             }
-          } catch (parseError) {
-            console.error("Error parsing invoices from localStorage:", parseError);
-            // Reset to an empty array
-            localStorage.setItem('invoices', JSON.stringify([]));
-          }
+          } catch {}
         }
-        
-        // Close modal
         setShowDeleteModal(false);
         setInvoiceToDelete(null);
       } catch (error) {
@@ -711,84 +571,72 @@ const InvoiceList = () => {
       }
     }
   };
-  
-  // Open email modal
+
+  // Email modal
   const openEmailModal = (invoice) => {
     setInvoiceToEmail(invoice);
     setEmailDetails({
-      to: invoice.email,
-      subject: `Invoice #${invoice.id} from Your Company`,
-      message: `Dear ${invoice.customer},\n\nPlease find attached invoice #${invoice.id} due on ${invoice.dueDate}.\n\nInvoice Amount: ${formatMoney(invoice.amount)}\nAmount Received: ${formatMoney(invoice.received)}\nAmount Pending: ${formatMoney(invoice.pending)}\n\nThank you for your business.\n\nBest regards,\nYour Company`
+      to: invoice.email || '',
+      subject: `Invoice #${invoice.invoiceNumber || invoice.id} from Your Company`,
+      message: `Dear ${invoice.customer},\n\nPlease find attached invoice #${invoice.invoiceNumber || invoice.id} due on ${invoice.dueDate}.\n\nInvoice Amount: ${formatMoney(invoice.amount)}\nAmount Received: ${formatMoney(invoice.received)}\nAmount Pending: ${formatMoney(invoice.pending)}\n\nThank you for your business.\n\nBest regards,\nYour Company`
     });
     setShowEmailModal(true);
   };
-  
-  // Open view modal
+
   const openViewModal = (invoice) => {
     setInvoiceToView(invoice);
     setShowViewModal(true);
   };
-  
-  // Handle email form change
+
   const handleEmailChange = (e) => {
     const { name, value } = e.target;
-    setEmailDetails(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setEmailDetails(prev => ({ ...prev, [name]: value }));
   };
-  
-  // Send email
+
   const sendEmail = () => {
-    // In a real app, you would send the email through your backend
     console.log('Sending email:', emailDetails);
-    
-    // Close modal and show success message
     setShowEmailModal(false);
     setShowEmailSuccess(true);
-    
-    // Hide success message after 5 seconds
-    setTimeout(() => {
-      setShowEmailSuccess(false);
-    }, 5000);
+    setTimeout(() => setShowEmailSuccess(false), 5000);
   };
 
-  // Available months for the dropdown
-  const availableMonths = getInvoiceMonths();
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber < 1) return;
+    if (isServerData) {
+      if (serverTotalPages && pageNumber > serverTotalPages) return;
+    } else {
+      const localTotalPages = Math.ceil((localFilteredInvoices.length || 0) / entriesPerPage);
+      if (pageNumber > localTotalPages) return;
+    }
+    setCurrentPage(pageNumber);
+  };
 
-  // Function to reset all invoice data (for troubleshooting)
+  // Refresh button -> re-hit backend
+  const handleRefresh = () => {
+    fetchInvoicesFromServer(currentPage, entriesPerPage, searchTerm, 'all');
+  };
+
+  // Reset localStorage helper
   const resetAllInvoiceData = () => {
-    // First, display the current localStorage state
     try {
       const savedInvoicesString = localStorage.getItem('invoices');
       const countMessage = savedInvoicesString 
         ? `Currently there are ${JSON.parse(savedInvoicesString).length} invoices in localStorage.` 
         : "There are no invoices in localStorage.";
-      
       const sizeMessage = savedInvoicesString
         ? `Storage size: ${Math.round(savedInvoicesString.length / 1024 * 100) / 100} KB` 
         : "";
-        
-      if (window.confirm(`${countMessage} ${sizeMessage}\n\nAre you sure you want to reset ALL invoice data? This cannot be undone.`)) {
-        try {
-          // Clear localStorage
-          localStorage.removeItem('invoices');
-          // Reset state
-          setInvoices([]);
-          console.log("All invoice data has been reset");
-          alert("All invoice data has been reset successfully.");
-        } catch (error) {
-          console.error("Error resetting invoice data:", error);
-          alert("Error resetting invoice data: " + error.message);
-        }
+      if (window.confirm(`${countMessage} ${sizeMessage}\n\nAre you sure you want to reset ALL invoice data in your browser? This cannot be undone.`)) {
+        localStorage.removeItem('invoices');
+        if (!isServerData) setInvoices([]);
+        alert("All local invoice data has been reset.");
       }
     } catch (error) {
       console.error("Error checking localStorage:", error);
-      
       if (window.confirm("Error checking localStorage. Would you like to reset all data anyway?")) {
         localStorage.removeItem('invoices');
-        setInvoices([]);
-        alert("All invoice data has been reset.");
+        if (!isServerData) setInvoices([]);
+        alert("All local invoice data has been reset.");
       }
     }
   };
@@ -835,7 +683,7 @@ const InvoiceList = () => {
       {showEmailSuccess && (
         <Alert variant="success" className="d-flex justify-content-between align-items-center">
           <span>
-            <strong>Success:</strong> Email has been sent to {invoiceToEmail?.customer} ({invoiceToEmail?.email}).
+            <strong>Success:</strong> Email has been sent to {invoiceToEmail?.customer} ({invoiceToEmail?.email || 'N/A'}).
           </span>
           <Button 
             variant="outline-success" 
@@ -885,7 +733,7 @@ const InvoiceList = () => {
           <Button 
             variant="info" 
             className="me-2"
-            onClick={loadInvoicesFromStorage}
+            onClick={handleRefresh}
           >
             <i className="bi bi-arrow-clockwise me-1"></i> Refresh List
           </Button>
@@ -921,56 +769,37 @@ const InvoiceList = () => {
             onClick={resetAllInvoiceData}
             size="sm"
           >
-            <i className="bi bi-trash me-1"></i> Reset All Data
+            <i className="bi bi-trash me-1"></i> Reset Local Data
           </Button>
         </div>
 
-        {/* Use our new ShowEntries component */}
         <ShowEntries
           entriesPerPage={entriesPerPage}
           setEntriesPerPage={setEntriesPerPage}
           searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          totalEntries={invoices.length}
+          setSearchTerm={(v) => { setCurrentPage(1); setSearchTerm(v); }}
+          totalEntries={totalEntries}
           searchPlaceholder="Search by invoice #, customer, date..."
         />
         
-        <Table striped bordered hover responsive>
+        <Table hover responsive>
           <thead>
             <tr>
-              <th>
-                Invoice <i className="bi bi-arrow-down-up"></i>
-              </th>
-              <th>
-                Customer <i className="bi bi-arrow-down-up"></i>
-              </th>
-              <th>
-                Issue Date <i className="bi bi-arrow-down-up"></i>
-              </th>
-              <th>
-                Due Date <i className="bi bi-arrow-down-up"></i>
-              </th>
-              <th>
-                Total Amount <i className="bi bi-arrow-down-up"></i>
-              </th>
-              <th>
-                Received <i className="bi bi-arrow-down-up"></i>
-              </th>
-              <th>
-                Pending <i className="bi bi-arrow-down-up"></i>
-              </th>
-              <th>
-                Status <i className="bi bi-arrow-down-up"></i>
-              </th>
-              <th>
-                Actions
-              </th>
+              <th>Invoice <i className="bi bi-arrow-down-up"></i></th>
+              <th>Customer <i className="bi bi-arrow-down-up"></i></th>
+              <th>Issue Date <i className="bi bi-arrow-down-up"></i></th>
+              <th>Due Date <i className="bi bi-arrow-down-up"></i></th>
+              <th>Total Amount <i className="bi bi-arrow-down-up"></i></th>
+              <th>Received <i className="bi bi-arrow-down-up"></i></th>
+              <th>Pending <i className="bi bi-arrow-down-up"></i></th>
+              <th>Status <i className="bi bi-arrow-down-up"></i></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredInvoices.slice(indexOfFirstInvoice, indexOfLastInvoice).map(invoice => (
-              <tr key={`${invoice.id}-${invoice.customer}`}>
-                <td>{invoice.id}</td>
+            {visibleInvoices.map(invoice => (
+              <tr key={`${invoice.invoiceNumber || invoice.id}-${invoice.customer}`}>
+                <td>{invoice.invoiceNumber || invoice.id}</td>
                 <td>{invoice.customer}</td>
                 <td>{invoice.issueDate}</td>
                 <td>{invoice.dueDate}</td>
@@ -1000,10 +829,11 @@ const InvoiceList = () => {
                       variant="success"
                       size="sm"
                       className="me-1"
-                      onClick={() => handleDownloadInvoice(invoice.id)}
-                      disabled={downloadInvoiceId === invoice.id}
+                      onClick={() => handleDownloadInvoice(invoice)}
+                      disabled={downloadInvoiceId === (invoice.invoiceNumber || invoice.id)}
+                      title={invoice.pdfDownloadUrl || invoice.pdfUrl ? 'Download PDF' : 'Generate Excel'}
                     >
-                      {downloadInvoiceId === invoice.id ? 
+                      {downloadInvoiceId === (invoice.invoiceNumber || invoice.id) ? 
                         <span className="spinner-border spinner-border-sm download-spinner" role="status" aria-hidden="true"></span> : 
                         <i className="bi bi-download"></i>
                       }
@@ -1019,7 +849,7 @@ const InvoiceList = () => {
                 </td>
               </tr>
             ))}
-            {filteredInvoices.length === 0 && (
+            {visibleInvoices.length === 0 && (
               <tr>
                 <td colSpan="9" className="text-center">No matching records found</td>
               </tr>
@@ -1038,8 +868,16 @@ const InvoiceList = () => {
         
         <div className="d-flex justify-content-between align-items-center">
           <div>
-            Showing {indexOfFirstInvoice + 1} to {Math.min(indexOfLastInvoice, filteredInvoices.length)} of {filteredInvoices.length} entries
-            {searchTerm && ` (filtered from ${invoices.length} total entries)`}
+            {isServerData ? (
+              <>
+                Showing {(serverTotalCount === 0) ? 0 : ((currentPage - 1) * entriesPerPage + 1)} to {Math.min(currentPage * entriesPerPage, serverTotalCount)} of {serverTotalCount} entries
+              </>
+            ) : (
+              <>
+                Showing {Math.min(indexOfFirstInvoice + 1, localFilteredInvoices.length)} to {Math.min(indexOfLastInvoice, localFilteredInvoices.length)} of {localFilteredInvoices.length} entries
+                {searchTerm && ` (filtered from ${invoices.length} total entries)`}
+              </>
+            )}
           </div>
           
           <Pagination>
@@ -1080,7 +918,7 @@ const InvoiceList = () => {
         <Modal.Body>
           {invoiceToDelete && (
             <p>
-              Are you sure you want to delete Invoice #{invoiceToDelete.id} for {invoiceToDelete.customer}?
+              Are you sure you want to delete Invoice #{invoiceToDelete.invoiceNumber || invoiceToDelete.id} for {invoiceToDelete.customer}?
               <br />
               <br />
               <strong>This action cannot be undone.</strong>
@@ -1103,7 +941,7 @@ const InvoiceList = () => {
           <Modal.Title>
             Send Invoice Email
             {invoiceToEmail && (
-              <span className="text-muted fs-6"> - Invoice #{invoiceToEmail.id} for {invoiceToEmail.customer}</span>
+              <span className="text-muted fs-6"> - Invoice #{invoiceToEmail.invoiceNumber || invoiceToEmail.id} for {invoiceToEmail.customer}</span>
             )}
           </Modal.Title>
         </Modal.Header>
@@ -1164,13 +1002,14 @@ const InvoiceList = () => {
       
       {/* View Invoice Modal */}
       <Modal show={showViewModal} onHide={() => setShowViewModal(false)} size="lg">
-        <Modal.Header closeButton>
+        <Modal.Header >
           <Modal.Title>
             Invoice Details
             {invoiceToView && (
-              <span className="text-muted fs-6"> - Invoice #{invoiceToView.id} for {invoiceToView.customer}</span>
+              <span className="text-muted fs-6"> - Invoice #{invoiceToView.invoiceNumber || invoiceToView.id} for {invoiceToView.customer}</span>
             )}
           </Modal.Title>
+          <Button onClick={() => setShowViewModal(false)} className="X-button">X</Button>
         </Modal.Header>
         <Modal.Body>
           {invoiceToView && (
@@ -1183,7 +1022,7 @@ const InvoiceList = () => {
                 </Col>
                 <Col md={6}>
                   <h5>Invoice Information</h5>
-                  <p><strong>Invoice #:</strong> {invoiceToView.id}</p>
+                  <p><strong>Invoice #:</strong> {invoiceToView.invoiceNumber || invoiceToView.id}</p>
                   <p><strong>Issue Date:</strong> {invoiceToView.issueDate}</p>
                   <p><strong>Due Date:</strong> {invoiceToView.dueDate}</p>
                   <p><strong>Status:</strong> {getStatusBadge(invoiceToView.status)}</p>
@@ -1207,6 +1046,11 @@ const InvoiceList = () => {
                   </tr>
                 </tbody>
               </Table>
+              {invoiceToView.pdfUrl && (
+                <div className="mt-2">
+                  <a href={invoiceToView.pdfUrl} target="_blank" rel="noreferrer">Open PDF</a>
+                </div>
+              )}
             </div>
           )}
         </Modal.Body>
@@ -1217,11 +1061,11 @@ const InvoiceList = () => {
           <Button 
             variant="success" 
             onClick={() => {
-              handleDownloadInvoice(invoiceToView.id);
+              handleDownloadInvoice(invoiceToView);
               setShowViewModal(false);
             }}
           >
-            Download Invoice
+            {(invoiceToView?.pdfDownloadUrl || invoiceToView?.pdfUrl) ? 'Download PDF' : 'Download (Excel)'}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -1229,4 +1073,14 @@ const InvoiceList = () => {
   );
 };
 
-export default InvoiceList; 
+export default InvoiceList;
+
+// ===== helper (top-level scope for mapping) =====
+function formatYmdToDmy(ymd) {
+  try {
+    const [y, m, d] = ymd.split('-');
+    return `${d}/${m}/${y}`;
+  } catch {
+    return ymd;
+  }
+}

@@ -234,7 +234,7 @@ const ManageSalary = () => {
             searchPlaceholder="Search employee, ID, month..."
           />
           
-          <Table striped bordered hover responsive className="mt-3">
+          <Table hover responsive className="mt-3">
             <thead>
               <tr>
                 <th onClick={() => handleSort('employeeId')} style={{ cursor: 'pointer' }}>

@@ -20,6 +20,10 @@ import Dashboard from './components/Dashboard';
 // Customer Components
 import { CustomerList, CustomerAdd, CustomerEdit } from './components/customers';
 
+//Employee Components
+import AdminList from '../employee/list';
+import AdminPage from '../employee/Createpage';
+
 // Invoice Components
 import InvoiceCreate from './components/invoices/InvoiceCreate';
 import { InvoiceList, InvoiceDownload, InvoiceEdit, InvoiceView } from './components/invoices/placeholder';
@@ -68,6 +72,10 @@ function App() {
                         <Route path="/customers/list" element={<CustomerList />} />
                         <Route path="/customers/add" element={<CustomerAdd />} />
                         <Route path="/customers/edit/:id" element={<CustomerEdit />} />
+
+                        {/* Employer Routes */}
+                        <Route path="/employee" element={<AdminList />} />
+                        <Route path="/employee/create" element={<AdminPage />} />
                         
                         {/* Invoice Routes */}
                         <Route path="/invoices" element={<InvoiceList />} />

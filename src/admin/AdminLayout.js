@@ -60,12 +60,12 @@ const AdminLayout = () => {
           </Nav.Link>
           
           <div className="sidebar-section">Content Management</div>
-          <Nav.Link as={Link} to="/admin/header" className={isActive('/admin/header') ? 'active' : ''}>
+          {/* <Nav.Link as={Link} to="/admin/header" className={isActive('/admin/header') ? 'active' : ''}>
             <i className="fas fa-envelope"></i> Header
           </Nav.Link>
           <Nav.Link as={Link} to="/admin/footer" className={isActive('/admin/footer') ? 'active' : ''}>
             <i className="fas fa-address-card"></i> Footer
-          </Nav.Link>
+          </Nav.Link> */}
           <Nav.Link as={Link} to="/admin/logo" className={isActive('/admin/logo') ? 'active' : ''}>
             <i className="fas fa-image"></i> Logo
           </Nav.Link>
@@ -100,9 +100,33 @@ const AdminLayout = () => {
               </div>
             </Collapse>
           </div>
+
+          {/* Employer Section */}
+          <div className={`nav-item-with-submenu ${openSubMenu === 'employee' ? 'open' : ''}`}>
+            <div 
+              className={`nav-link ${isActive('/admin/employee') ? 'active' : ''}`} 
+              onClick={() => toggleSubMenu('employee')}
+            >
+              <i className="fas fa-file-invoice-dollar"></i> Employee
+              <i className={`fas fa-chevron-${openSubMenu === 'employee' ? 'down' : 'right'} submenu-icon`}></i>
+            </div>
+            <Collapse in={openSubMenu === 'employee'}>
+              <div className="submenu">
+                <Nav.Link as={Link} to="/admin/employee" className={location.pathname === '/admin/employee' ? 'active' : ''}>
+                  <i className="fas fa-list"></i> List
+                </Nav.Link>
+                <Nav.Link as={Link} to="./employee/createpage" className={location.pathname === '/admin/employee/createpage' ? 'active' : ''}>
+                  <i className="fas fa-plus"></i> Create
+                </Nav.Link>
+                {/* <Nav.Link as={Link} to="/admin/invoices/download" className={location.pathname === '/admin/invoices/download' ? 'active' : ''}>
+                  <i className="fas fa-download"></i> Download Invoices
+                </Nav.Link> */}
+              </div>
+            </Collapse>
+          </div>
           
           {/* Invoices dropdown */}
-          <div className={`nav-item-with-submenu ${openSubMenu === 'invoices' ? 'open' : ''}`}>
+          {/* <div className={`nav-item-with-submenu ${openSubMenu === 'invoices' ? 'open' : ''}`}>
             <div 
               className={`nav-link ${isActive('/admin/invoices') ? 'active' : ''}`} 
               onClick={() => toggleSubMenu('invoices')}
@@ -124,9 +148,9 @@ const AdminLayout = () => {
               </div>
             </Collapse>
           </div>
-          
+           */}
           {/* Salary dropdown */}
-          <div className={`nav-item-with-submenu ${openSubMenu === 'salary' ? 'open' : ''}`}>
+          {/* <div className={`nav-item-with-submenu ${openSubMenu === 'salary' ? 'open' : ''}`}>
             <div 
               className={`nav-link ${isActive('/admin/salary') ? 'active' : ''}`} 
               onClick={() => toggleSubMenu('salary')}
@@ -144,7 +168,7 @@ const AdminLayout = () => {
                 </Nav.Link>
               </div>
             </Collapse>
-          </div>
+          </div> */}
           
           {/* Users dropdown */}
           <div className={`nav-item-with-submenu ${openSubMenu === 'users' ? 'open' : ''}`}>
@@ -168,7 +192,7 @@ const AdminLayout = () => {
           </div>
 
           {/* Letters dropdown */}
-          <div className={`nav-item-with-submenu ${openSubMenu === 'letters' ? 'open' : ''}`}>
+          {/* <div className={`nav-item-with-submenu ${openSubMenu === 'letters' ? 'open' : ''}`}>
             <div 
               className={`nav-link ${isActive('/admin/letters') ? 'active' : ''}`} 
               onClick={() => toggleSubMenu('letters')}
@@ -181,7 +205,7 @@ const AdminLayout = () => {
                 {/* <Nav.Link as={Link} to="/admin/letters" className={location.pathname === '/admin/letters' ? 'active' : ''}>
                   <i className="fas fa-list"></i> Letter List
                 </Nav.Link> */}
-                <Nav.Link as={Link} to="/admin/letters/create" className={location.pathname === '/admin/letters/create' ? 'active' : ''}>
+                {/* <Nav.Link as={Link} to="/admin/letters/create" className={location.pathname === '/admin/letters/create' ? 'active' : ''}>
                   <i className="fas fa-plus"></i> Create Letter
                 </Nav.Link>
                 <Nav.Link as={Link} to="/admin/letters/download" className={location.pathname === '/admin/letters/download' ? 'active' : ''}>
@@ -189,7 +213,7 @@ const AdminLayout = () => {
                 </Nav.Link>
               </div>
             </Collapse>
-          </div>
+          </div> */} 
         </Nav>
         <div className="sidebar-footer">
           <button onClick={handleLogout} className="btn btn-outline-light">

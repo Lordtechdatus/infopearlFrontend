@@ -51,6 +51,18 @@
   transform: scale(0.95);
 }
 
+.X-button {
+  color: black;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+}
+
+.X-button:hover {
+  color: black;
+  background-color: darkgray;
+}
+
 /* Monthly download dropdown styling */
 .monthly-dropdown button {
   background: linear-gradient(135deg, #00695c, #004d40);

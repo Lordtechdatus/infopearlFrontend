@@ -3,9 +3,9 @@ import { Card, Row, Col } from 'react-bootstrap';
 import './adminDashboard.css';
 
 // Import management components
-import HeaderSettings from './ContentManagement/HeaderSettings';
+// import HeaderSettings from './ContentManagement/HeaderSettings';
 import LogoSettings from './ContentManagement/LogoSettings';
-import FooterSettings from './ContentManagement/FooterSettings';
+// import FooterSettings from './ContentManagement/FooterSettings';
 import InvoiceList from './invoices/InvoiceList';
 
 // Import customer, salary, and user management components
@@ -44,24 +44,24 @@ const AdminDashboard = () => {
       <div className="mb-4">
         <h5 className="border-bottom pb-2 mb-3">Content Management</h5>
         <div className="cards-container">
-          <DashboardCard 
+          {/* <DashboardCard 
             icon="fa-envelope"
             title="Header Settings"
             description="Update email and phone"
             href="/admin/header"
-          />
+          /> */}
           <DashboardCard 
             icon="fa-image"
             title="Logo Management"
             description="Change website logo"
             href="/admin/logo"
           />
-          <DashboardCard 
+          {/* <DashboardCard 
             icon="fa-address-card"
             title="Footer Settings"
             description="Update contact information"
             href="/admin/footer"
-          />
+          /> */}
           <DashboardCard 
             icon="fa-images"
             title="Gallery Management"
