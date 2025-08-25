@@ -288,7 +288,7 @@ const Expertise = () => {
 
       {/* Call to Action */}
       <section className="cta-section">
-        <div className="container">
+        <div className="container" style={{ backgroundColor: 'transparent' }}>
           <motion.div
             className="cta-content"
             initial="hidden"

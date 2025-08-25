@@ -115,8 +115,8 @@
 .service-img-5 {
   width: 100%;
   height: 300px; /* adjust height as needed */
-  background-image: url('../assets/it.png'); /* updated to use existing asset */
-  background-size: cover;
+  background-image: url('../assets/data.png'); /* updated to use existing asset */
+  background-size: contain;
   background-position: center;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);

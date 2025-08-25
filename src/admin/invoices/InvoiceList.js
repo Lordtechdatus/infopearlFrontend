@@ -6,6 +6,7 @@ import './InvoiceList.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import '../../styles/pagination.css';
 import { saveAs } from 'file-saver';
+import SEO from '../../components/SEO.js';
 
 // ====== CONFIG ======
 const API_BASE = 'https://backend.infopearl.in'; // adjust if needed
@@ -704,6 +705,12 @@ const InvoiceList = () => {
 
   return (
     <Container fluid>
+      <SEO 
+        title="Invoice List"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/InvoiceList"
+      />
       <h1 className="mb-4">Invoice List</h1>
 
       {showDeleteSuccess && (

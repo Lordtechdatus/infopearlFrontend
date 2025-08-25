@@ -90,7 +90,7 @@ const AdminDashboard = () => {
       </div>
       
       <div className="mb-4">
-        <h5 className="border-bottom pb-2 mb-3">Invoice Management</h5>
+        <h5 className="border-bottom pb-2 mb-3">Management</h5>
         <div className="cards-container">
           <DashboardCard 
             icon="fa-users"

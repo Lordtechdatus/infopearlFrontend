@@ -6,6 +6,7 @@ import html2canvas from 'html2canvas';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import logo from '../../assets/logo1.png';
 import './SalarySlip.css';
+import SEO from '../../components/SEO.js';
 
 const SalarySlip = () => {
   // Add navigate for redirecting after form submission
@@ -729,6 +730,12 @@ const SalarySlip = () => {
 
   return (
     <Container fluid>
+      <SEO 
+        title="Create"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/createSalarySlip"
+      />
       <h1 className="mb-4">Create Salary Slip</h1>
       {!showSalarySlipPreview ? (
         // Salary Slip Creation Form

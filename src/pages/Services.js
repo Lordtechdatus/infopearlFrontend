@@ -252,7 +252,7 @@ const Services = () => {
                 style={{
                   width: '100%',
                   height: '400px',
-                  objectFit: 'cover',
+                  objectFit: 'contain',
                   borderRadius: '12px',
                   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                 }}

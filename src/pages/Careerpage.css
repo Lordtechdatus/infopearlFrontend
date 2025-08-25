@@ -10,7 +10,7 @@
 }
 
 .career-banner {
-  background-image: url('../assets/career.avif');
+  /* background-image: url('../assets/career.avif'); */
   background-repeat: no-repeat;
   background-size: contain;
   padding: 80px 0;
@@ -83,7 +83,7 @@
 /* Careerpage.css */
 
 .career-banner {
-  background-image: url('../assets/background.png');
+  /* background-image: url('../assets/background.png'); */
   background-repeat: no-repeat;
   background-size: cover;
   color: white;

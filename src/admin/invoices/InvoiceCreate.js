@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import SEO from '../../components/SEO.js';
 
 // =========================
 // API base + upload helper
@@ -690,6 +691,12 @@ const InvoiceCreate = () => {
 
   return (
     <Container fluid>
+      <SEO 
+        title="Create"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/InvoiceCreate"
+      />
       {!showInvoicePreview ? (
         <>
           <div className="d-flex justify-content-between align-items-center mb-3">
