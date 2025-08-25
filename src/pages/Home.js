@@ -185,7 +185,7 @@ const Home = () => {
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
-            // style={{ color: 'rgba(0, 0, 0, 0.80)' }}
+            style={{ color: 'white', fontWeight: 500 }}
           >
             InfoPearl Tech Solutions
           </motion.h1>
@@ -524,6 +524,7 @@ const Home = () => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
+          style={{ backgroundColor: 'transparent' }}
         >
           <div className="student-hire-content">
             <div className="student-hire-text">
@@ -1218,7 +1219,7 @@ const Home = () => {
 
       {/* Keep in Touch Section */}
       <section className="keep-in-touch-section">
-        <div className="container">
+        <div className="container" style={{ backgroundColor: 'transparent' }}>
           <motion.div 
             className="keep-in-touch-container"
             initial={{ opacity: 0, y: 30 }}
@@ -1286,7 +1287,7 @@ const Home = () => {
 
       {/* ISO Certification Banner */}
       <section className="iso-banner-section">
-        <div className="container">
+        <div className="container" style={{ backgroundColor: 'transparent' }}>
           <img 
             src={IsoBanner} 
             alt="ISO Certified Company" 
@@ -1304,7 +1305,7 @@ const Home = () => {
 
       {/* Call to Action Section */}
       <section className="cta-section">
-        <div className="container">
+        <div className="container" style={{ backgroundColor: 'transparent' }}>
           <motion.div
             className="cta-content"
             initial="hidden"

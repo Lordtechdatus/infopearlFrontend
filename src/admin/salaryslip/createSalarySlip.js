@@ -21,41 +21,15 @@ const SalarySlip = () => {
   // Reference for the slip preview
   const slipRef = useRef(null);
 
-  // State for form data
-  // const [formData, setFormData] = useState({
-  //   employeeId: 'EMP001',
-  //   employeeName: '',
-  //   designation: '',
-  //   department: '',
-  //   payPeriod: '',  // New field
-  //   paidDays: '',   // New field
-  //   lossOfPayDays: '',  // New field
-  //   payDate: '',    // New field
-  //   companyInfo: {
-  //     name: 'Infopearl Tech Solutions Pvt Ltd',
-  //     address1: 'G1 Akansha Apartment',
-  //     address2: 'Patel Nagar, City center',
-  //     phone: '7000937390',
-  //     email: 'infopearl396@gmail.com',
-  //     website: 'www.infopearl.in'
-  //   },
-  //   additionalFields: [],  // For custom fields added by the user
-  //   earnings: [/* ... */],
-  //   deductions: [/* ... */],
-  //   totalEarnings: '0.00',
-  //   totalDeductions: '0.00',
-  //   netSalary: '0.00',
-  // });
-  
   const [formData, setFormData] = useState({
     employeeId: 'EMP001',
     employeeName: '',
     designation: '',
     department: '',
-    payPeriod: '',  // New field
-    paidDays: '',   // New field
-    lossOfPayDays: '',  // New field
-    payDate: '',    // New field
+    payPeriod: '',
+    paidDays: '',
+    lossOfPayDays: '',
+    payDate: '',
     joiningDate: '',
     companyInfo: {
       name: 'Infopearl Tech Solutions Pvt Ltd',
@@ -78,7 +52,6 @@ const SalarySlip = () => {
       },
     ],
     deductions: [
-      
       {
         id: Date.now().toString() + 4,
         description: 'Income Tax',
@@ -98,12 +71,13 @@ const SalarySlip = () => {
     netSalary: '0.00'
   });
 
-  // Auto-fill current month when component mounts
+  // Auto-fill current month/year and employee ID when component mounts
   useEffect(() => {
     const currentDate = new Date();
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
                         'July', 'August', 'September', 'October', 'November', 'December'];
     const currentMonth = monthNames[currentDate.getMonth()];
+    const currentYear = String(currentDate.getFullYear());
     
     // Get or initialize the next employee ID
     let nextEmpId = 1;
@@ -154,13 +128,16 @@ const SalarySlip = () => {
     setFormData(prev => ({
       ...prev,
       employeeId: formattedEmployeeId,
-      month: currentMonth
+      month: currentMonth,
+      year: currentYear,
+      // set default pay period if not already set
+      payPeriod: prev.payPeriod || getCurrentMonthYear()
     }));
     
     // Don't increment the counter here since we don't know if the user will actually save this slip
   }, []);
 
-  // Format date as DD/MM/YYYY
+  // Format date as DD/MM/YYYY (not used for submission; inputs give YYYY-MM-DD)
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -172,13 +149,13 @@ const SalarySlip = () => {
   const handleAddField = () => {
     setFormData(prev => ({
       ...prev,
-      additionalFields: [...prev.additionalFields, { name: '', value: '' }]
+      additionalFields: [...(prev.additionalFields || []), { name: '', value: '' }]
     }));
   };
 
   // Function to handle changes to the custom field
   const handleCustomFieldChange = (index, field, value) => {
-    const updatedFields = [...formData.additionalFields];
+    const updatedFields = [...(formData.additionalFields || [])];
     updatedFields[index][field] = value;
     setFormData(prev => ({
       ...prev,
@@ -376,8 +353,6 @@ const SalarySlip = () => {
       alert('Please enter employee name');
       return;
     }
-    
-    console.log('Salary slip form submitted:', formData);
     
     // Show salary slip preview
     setShowSalarySlipPreview(true);
@@ -577,12 +552,18 @@ const SalarySlip = () => {
     navigate('/manage-salary');
   };
 
-  // Handle Save and PDF Download
+  /**
+   * Handle Save and PDF Download + Upload to backend (DB)
+   * This will:
+   * 1) Generate PDF from preview DOM
+   * 2) Save locally (download)
+   * 3) Upload the PDF + metadata to your PHP endpoint to store in DB
+   */
   const handleSaveAndDownload = async () => {
     try {
       setIsGeneratingPdf(true);
       
-      // First save the salary slip data
+      // First save the salary slip data in localStorage (optional)
       const salarySlips = JSON.parse(localStorage.getItem('salarySlips') || '[]');
       
       // Create a properly formatted salary slip object
@@ -615,7 +596,7 @@ const SalarySlip = () => {
       
       // Save to localStorage
       localStorage.setItem('salarySlips', JSON.stringify(salarySlips));
-      console.log("Saved salary slip:", slipToSave);
+      console.log("Saved salary slip (local):", slipToSave);
       
       // If it's a new slip, increment the next employee ID
       if (isNewSlip) {
@@ -627,7 +608,7 @@ const SalarySlip = () => {
         }
       }
       
-      // Then generate and download PDF
+      // Then generate PDF from the preview DOM
       const slipElement = document.getElementById('salary-slip-preview');
       if (!slipElement) {
         console.error('Could not find element with id "salary-slip-preview"');
@@ -636,10 +617,10 @@ const SalarySlip = () => {
         return;
       }
       
-      // Use html2canvas to render the slip to a canvas
+      // Render the slip to a canvas
       const canvas = await html2canvas(slipElement, {
         scale: 2, // Higher scale for better quality
-        useCORS: true, // Allow loading external images
+        useCORS: true,
         logging: false
       });
       
@@ -655,19 +636,56 @@ const SalarySlip = () => {
       const imgY = 0;
       
       pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-      pdf.save(`SalarySlip_${formData.employeeName}_${formData.month}_${formData.year}.pdf`);
-      
-      // Store saved slip ID for editing
-      setSavedSlipId(slipToSave.id);
-      
-      // Show success message instead of alert
-      setShowSuccessMessage(true);
-      
-      // Stay on the same page instead of navigating to home
-      // navigate('/'); - commented out
+
+      // Build a nice filename
+      const pdfNameSafe = `SalarySlip_${(formData.employeeName || formData.employeeId || 'Employee')}_${formData.payPeriod || `${formData.month}_${formData.year}`}`
+        .replace(/\s+/g, '_')
+        .replace(/[^A-Za-z0-9._-]/g, '');
+      const pdfFileName = `${pdfNameSafe}.pdf`;
+
+      // Prepare to upload PDF + metadata to backend
+      const pdfBlob = pdf.output('blob');
+
+      const metaPayload = {
+        empId: formData.employeeId,
+        empName: formData.employeeName,
+        designation: formData.designation,
+        department: formData.department,
+        joiningDate: formData.joiningDate || '',      // "YYYY-MM-DD" or ''
+        payPeriod: formData.payPeriod,                // "August 2025"
+        paidDays: String(formData.paidDays || 0),
+        lopDays: String(formData.lossOfPayDays || 0),
+        payDate: formData.payDate || '',              // "YYYY-MM-DD" or ''
+        netSalary: String(formData.netSalary || 0)
+      };
+
+      const multipart = new FormData();
+      multipart.append('meta', JSON.stringify(metaPayload));
+      multipart.append('pdf', new File([pdfBlob], pdfFileName, { type: 'application/pdf' }));
+
+      // POST to your PHP endpoint
+      // Make sure this URL matches where you deployed create-salaryslips.php
+      const resp = await fetch('https://backend.infopearl.in/create-salaryslips.php', {
+        method: 'POST',
+        body: multipart,
+        credentials: 'include'
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        console.error('Server error:', err);
+        alert(err?.message || 'Saving to database failed.');
+      } else {
+        const data = await resp.json();
+        console.log('Saved to DB:', data);
+        // Download locally for the user
+        pdf.save(pdfFileName);
+        setSavedSlipId(data.id || slipToSave.id);
+        setShowSuccessMessage(true);
+      }
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('There was an error generating the PDF. Please try again.');
+      console.error('Error generating PDF or saving:', error);
+      alert('There was an error generating the PDF or saving data. Please try again.');
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -700,11 +718,14 @@ const SalarySlip = () => {
     return words.trim();
   }
   
-  // Example usage:
-  console.log(numberToWords(123));     // "one hundred and twenty-three"
-  console.log(numberToWords(1500));    // "one thousand five hundred"
-  console.log(numberToWords(1234567)); // "one million two hundred thirty-four thousand five hundred sixty-seven"
-  
+  const getCurrentMonthYear = () => {
+    const d = new Date();
+    const monthNames = [
+      'January','February','March','April','May','June',
+      'July','August','September','October','November','December'
+    ];
+    return `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+  };
 
   return (
     <Container fluid>
@@ -824,16 +845,29 @@ const SalarySlip = () => {
                     </Form.Group>
                   </Col>
                   <Col md={4}>
-                    <Form.Group>
-                      <Form.Label style={{ color: 'black' }}>Pay Period</Form.Label>
+                  <Form.Group>
+                    <Form.Label style={{ color: 'black' }}>Pay Period</Form.Label>
+                    <InputGroup>
                       <Form.Control
                         type="text"
                         name="payPeriod"
                         value={formData.payPeriod}
                         onChange={handleChange}
+                        style={{ border: '1px solid lightgray' }}
                         required
                       />
-                    </Form.Group>
+                      <Button
+                        variant="outline-secondary"
+                        onClick={() =>
+                          setFormData(prev => ({ ...prev, payPeriod: getCurrentMonthYear() }))
+                        }
+                        title="Set to current month and year"
+                        style={{ border: 'none' }}
+                      >
+                        <i className="bi bi-calendar3" style={{ color: 'black' }}/>
+                      </Button>
+                    </InputGroup>
+                  </Form.Group>
                   </Col>
                 </Row>
                 
@@ -875,41 +909,6 @@ const SalarySlip = () => {
                   </Col>
                 </Row>
 
-                {/* Add Custom Fields Button */}
-                {/* <Button variant="secondary" onClick={handleAddField}>
-                  Add Custom Field
-                </Button> */}
-
-                {/* Render Custom Fields */}
-                {/* {formData.additionalFields.map((field, index) => (
-                  <Row key={index} className="mb-3">
-                    <Col md={4}>
-                      <Form.Group>
-                        <Form.Label style={{ color: 'black' }}>Field Name</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name={`customFieldName${index}`}
-                          value={field.name}
-                          onChange={(e) => handleCustomFieldChange(index, 'name', e.target.value)}
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md={4}>
-                      <Form.Group>
-                        <Form.Label style={{ color: 'black' }}>Field Value</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name={`customFieldValue${index}`}
-                          value={field.value}
-                          onChange={(e) => handleCustomFieldChange(index, 'value', e.target.value)}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                )
-              )
-              } */}
-
               </Card.Body>
             </Card>
 
@@ -920,7 +919,7 @@ const SalarySlip = () => {
               </Card.Header>
               <Card.Body>
                 <div className="table-responsive">
-                  <Table bordered>
+                  <Table bordered style={{ border: '1px solid transparent' }}>
                     <thead className="bg-light">
                       <tr>
                         <th style={{ width: '70%' }}>Description</th>
@@ -992,7 +991,7 @@ const SalarySlip = () => {
               </Card.Header>
               <Card.Body>
                 <div className="table-responsive">
-                  <Table bordered>
+                  <Table bordered style={{ border: '1px solid transparent' }}>
                     <thead className="bg-light">
                       <tr>
                         <th style={{ width: '50%' }}>Description</th>
@@ -1043,11 +1042,7 @@ const SalarySlip = () => {
                             )}
                           </td>
                           <td className="text-end">
-                            {deduction.isPercentage ? (
-                              <span>₹{parseFloat(deduction.amount).toFixed(2)}</span>
-                            ) : (
-                              <span>₹{parseFloat(deduction.amount).toFixed(2)}</span>
-                            )}
+                            <span>₹{parseFloat(deduction.amount).toFixed(2)}</span>
                           </td>
                           <td className="text-center">
                             <Button 
@@ -1095,7 +1090,7 @@ const SalarySlip = () => {
               <Card.Body>
                 <Row>
                   <Col md={6} className="mx-auto text-center">
-                    <Table bordered>
+                    <Table bordered style={{ border: '1px solid transparent' }}>
                       <tbody>
                         <tr>
                           <td className="text-end fw-bold">Total Earnings</td>
@@ -1417,10 +1412,6 @@ const SalarySlip = () => {
             }}>
               <span>Net Salary</span>
               <span>₹{formData.netSalary}</span>
-              {/* <br />
-              <span className="text-end fw-bold">
-                ₹{formData.netSalary} ({numberToWords(parseInt(formData.netSalary))} Rupees)
-              </span> */}
             </div>
 
             <div style={{ 
@@ -1432,13 +1423,10 @@ const SalarySlip = () => {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              // fontWeight: 'bold',
               fontSize: '18px',
               border: '1px solid #051937',
               borderRadius: '4px'
             }}>
-              {/* <span>NET SALARY</span>
-              <span>₹{formData.netSalary}</span> */}
               <span className="text-end fw-bold">
                 Net Salary in word: {numberToWords(parseInt(formData.netSalary)).charAt(0).toUpperCase() + numberToWords(parseInt(formData.netSalary)).slice(1)} Rupees
               </span>
@@ -1483,4 +1471,4 @@ const SalarySlip = () => {
   );
 };
 
-export default SalarySlip; 
+export default SalarySlip;

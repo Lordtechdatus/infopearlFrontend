@@ -1,5 +1,4 @@
 /* src/components/Footer.css */
-
 .footer {
   background-color: var(--primary-color);
   color: white;
@@ -10,6 +9,11 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 2fr;
   gap: 40px;
+  background-color: var(--primary-color);
+}
+
+.container {
+  background-color: var(--primary-color);
 }
 
 .footer-section {

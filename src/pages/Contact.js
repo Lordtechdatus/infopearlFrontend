@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { contactImageBase64 } from '../assets';
 import './Contact.css';
+import SEO from '../components/SEO';
 
 const fadeIn = {
   hidden: { opacity: 0 },
@@ -84,12 +85,18 @@ const Contact = () => {
   // REMOVED: testBackendConnection function
   return (
     <div className="page-content">
+            <SEO 
+        title="Contact"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/contact"
+      />
       {/* Page Header */}
       <section className="page-header">
         <div className="contact-image-container">
           <img src={contactImageBase64} alt="IT Solutions Contact" className="contact-image" />
         </div>
-        <div className="container">
+        <div className="container" style={{ backgroundColor: 'transparent' }}>
           <motion.h1
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}

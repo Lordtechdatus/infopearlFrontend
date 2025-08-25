@@ -185,7 +185,7 @@ const LettersList = () => {
         <div className="p-3">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h3 className="mb-0">Letter Records</h3>
-            <Link to="/admin/createletter" className="btn btn-primary">
+            <Link to="/admin/employee/createpage" className="btn btn-primary">
               <i className="bi bi-plus-lg me-2"></i>
               Create New Letter
             </Link>

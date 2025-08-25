@@ -21,7 +21,7 @@ const About = () => {
         title="About Us"
         description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
         keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
-        canonicalUrl="https://yourwebsite.com/about"
+        canonicalUrl="https://infopearl.in/about"
       />
       
     <div className="page-content">
@@ -30,7 +30,7 @@ const About = () => {
         <div className="contact-image-container">
           <img src={contactImageBase64} alt="IT Solutions Contact" className="contact-image" />
         </div>
-        <div className="container">
+        <div className="container" style={{ backgroundColor: 'transparent' }}>
           <motion.h1
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}

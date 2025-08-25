@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/TeamMembers.css';
+import SEO from '../components/SEO';
 
 const TeamMembers = () => {
   const teamMembers = [
@@ -65,6 +66,12 @@ const TeamMembers = () => {
 
   return (
     <div className="team-members-container">
+      <SEO 
+        title="Team Member"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/team-member"
+      />
       <div className="team-header">
         <h1>Meet Our Team</h1>
         <p>Meet the talented professionals behind InfoPearl Tech's success</p>

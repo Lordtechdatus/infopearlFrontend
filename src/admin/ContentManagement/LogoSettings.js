@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import SEO from '../../components/SEO.js';
 
 const LogoSettings = () => {
   const [currentLogo, setCurrentLogo] = useState('/logo.png');
@@ -81,6 +82,12 @@ const LogoSettings = () => {
 
   return (
     <div className="content-management-container">
+      <SEO 
+        title="Logo Settings"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/logo-setting"
+      />
       <h2>Logo Management</h2>
       <p>Upload and manage the website logo</p>
       

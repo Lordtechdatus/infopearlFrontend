@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
 import './adminDashboard.css';
+import SEO from '../components/SEO';
 
 // Import management components
 // import HeaderSettings from './ContentManagement/HeaderSettings';
@@ -38,9 +39,13 @@ const AdminDashboard = () => {
 
   return (
     <div className="home-section">
+      <SEO 
+        title="Dashboard"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/dashboard"
+      />
       <h1>Welcome to Admin Dashboard</h1>
-      
-      
       <div className="mb-4">
         <h5 className="border-bottom pb-2 mb-3">Content Management</h5>
         <div className="cards-container">
@@ -93,17 +98,11 @@ const AdminDashboard = () => {
             description="Manage all your customer data in one place"
             href="/admin/customers"
           />
-          <DashboardCard 
-            icon="fa-money-check-alt"
-            title="Salary Management"
-            description="Employee salary & payroll processing"
-            href="/admin/salary"
-          />
            <DashboardCard 
             icon="fa-file-invoice-dollar"
-            title="Invoices"
+            title="Employees"
             description="Handle customer invoices"
-            href="/admin/invoices"
+            href="/admin/employee"
           />
           <DashboardCard 
             icon="fa-user-shield"

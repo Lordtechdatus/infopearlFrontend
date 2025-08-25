@@ -23,8 +23,8 @@ export const navData = {
       id: 3, 
       text: "Services", 
       path: "/services", 
-      dropdown: true,
-      megaMenu: true,
+      dropdown: false,
+      megaMenu: false,
       categories: [
         {
           id: 31,

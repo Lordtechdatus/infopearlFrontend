@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import './ContactMessages.css';
+import SEO from '../components/SEO.js';
 
 const ContactMessages = () => {
   const [messages, setMessages] = useState([]);
@@ -210,6 +211,12 @@ const ContactMessages = () => {
 
   return (
     <div className="contact-messages-page">
+      <SEO 
+        title="Messages"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/contact-messages"
+      />
       <motion.div className="page-header" initial="hidden" animate="visible" variants={fadeIn}>
         <h1 style={{ color: 'white' }}>
           {selectedTab === 'contact' ? 'Contact Messages' : 'Career Applications'}

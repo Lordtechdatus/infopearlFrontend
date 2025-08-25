@@ -901,7 +901,7 @@ const InvoiceCreate = () => {
             <div className="mb-4">
               <h2 className="mb-3">Item Details</h2>
               <div className="table-responsive">
-                <table className="table table-bordered">
+                <table className="table table-bordered" style={{ border: '1px solid transparent' }}>
                   <thead>
                     <tr>
                       <th style={{ width: '34%' }}>Description</th>
@@ -988,7 +988,7 @@ const InvoiceCreate = () => {
               <div className="row justify-content-end">
                 <div className="col-md-6">
                   <div className="table-responsive">
-                    <table className="table">
+                    <table className="table" style={{ border: '1px solid transparent' }}>
                       <tbody>
                         <tr>
                           <td className="text-end fw-bold">SUBTOTAL</td>

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import UPI from './UPI'; // <-- make sure this path is correct
 import '../styles/Payment.css';
+import SEO from '../components/SEO';
 
 const Payment = () => {
   // Optional: read ?tab=upi from URL so you can deep-link
@@ -149,9 +150,15 @@ const Payment = () => {
 
   return (
     <div className="payment-container">
+      <SEO 
+        title="Payment"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/payment"
+      />
       <div className="payment-options">
         <div className="payment-header">
-          <h1>Payment Options</h1>
+          <h1 style={{ color: 'white' }}>Payment Options</h1>
           <p>Choose your preferred payment method</p>
         </div>
 

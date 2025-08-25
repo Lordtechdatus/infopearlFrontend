@@ -9,6 +9,7 @@ import { saveAs } from 'file-saver';
 
 // ====== CONFIG ======
 const API_BASE = 'https://backend.infopearl.in'; // adjust if needed
+const DELETE_ENDPOINTS = ['/invoice-delete.php']; // try both (name varies)
 
 const InvoiceList = () => {
   // State for invoices, initially empty
@@ -82,7 +83,8 @@ const InvoiceList = () => {
         const dueDateFmt    = row.due_date_formatted || (row.due_date ? formatYmdToDmy(row.due_date) : '');
 
         return {
-          id: invoiceNumber || '',                 // display invoice_no in the "Invoice" column
+          id: invoiceNumber || '',                 // UI id shows invoice number
+          serverId: row.id ?? null,               // keep actual DB id separately for delete API
           invoiceNumber,                           // keep explicit
           customer: row.customer_name || 'Unknown Customer',
           email: '',                               // not provided by backend
@@ -159,6 +161,7 @@ const InvoiceList = () => {
 
           return {
             id: invoice.id || invoice.invoiceNumber || Date.now().toString(),
+            serverId: null, // not available from local data
             invoiceNumber: invoice.invoiceNumber,
             customer: customerName,
             email: invoice.customerInfo?.email || '',
@@ -212,7 +215,10 @@ const InvoiceList = () => {
   
   const [downloadInvoiceId, setDownloadInvoiceId] = useState(null);
   const [showDownloadSuccess, setShowDownloadSuccess] = useState(false);
-  
+
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState('');
+
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [invoiceToEmail, setInvoiceToEmail] = useState(null);
   const [emailDetails, setEmailDetails] = useState({ to: '', subject: '', message: '' });
@@ -243,9 +249,9 @@ const InvoiceList = () => {
 
   // ====== FILTER (local only) ======
   const localFilteredInvoices = !isServerData ? invoices.filter(invoice => 
-    invoice.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (invoice.customer || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (invoice.invoiceNumber || invoice.id || '').toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.status.toLowerCase().includes(searchTerm.toLowerCase())
+    (invoice.status || '').toLowerCase().includes(searchTerm.toLowerCase())
   ) : invoices;
 
   const visibleInvoices = isServerData
@@ -543,11 +549,62 @@ const InvoiceList = () => {
     setShowDeleteModal(true);
   };
 
-  // Delete invoice (local-only; server delete not implemented here)
-  const deleteInvoice = () => {
-    if (invoiceToDelete) {
-      try {
-        const updatedInvoices = invoices.filter(inv => (inv.invoiceNumber || inv.id) !== (invoiceToDelete.invoiceNumber || invoiceToDelete.id));
+  // Delete invoice: prefer server delete; fallback to local-only when not server data
+  const deleteInvoice = async () => {
+    if (!invoiceToDelete) return;
+
+    try {
+      if (isServerData) {
+        // Prepare payload: prefer server numeric id; else invoice_no
+        const payload = invoiceToDelete.serverId
+          ? { id: invoiceToDelete.serverId }
+          : { invoice_no: invoiceToDelete.invoiceNumber || invoiceToDelete.id };
+
+        let lastError = null;
+        let success = false;
+
+        // Try known endpoints (naming may vary)
+        for (const ep of DELETE_ENDPOINTS) {
+          try {
+            const res = await fetch(`${API_BASE}${ep}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              credentials: 'omit',
+              body: JSON.stringify(payload)
+            });
+
+            const maybeJson = await res.json().catch(() => null);
+
+            if (res.ok && maybeJson?.status === 'success') {
+              success = true;
+              // Remove from UI
+              const updated = invoices.filter(inv => 
+                (inv.invoiceNumber || inv.id) !== (invoiceToDelete.invoiceNumber || invoiceToDelete.id)
+              );
+              setInvoices(updated);
+              setDeleteMessage(`Invoice #${invoiceToDelete.invoiceNumber || invoiceToDelete.id} deleted successfully.`);
+              setShowDeleteSuccess(true);
+              setTimeout(() => setShowDeleteSuccess(false), 4000);
+              break;
+            } else {
+              lastError = new Error(maybeJson?.message || `Delete failed (${res.status})`);
+            }
+          } catch (e) {
+            lastError = e;
+          }
+        }
+
+        if (!success) {
+          throw lastError || new Error('Delete failed.');
+        }
+      } else {
+        // Local-only delete (no server data)
+        const updatedInvoices = invoices.filter(inv => 
+          (inv.invoiceNumber || inv.id) !== (invoiceToDelete.invoiceNumber || invoiceToDelete.id)
+        );
         setInvoices(updatedInvoices);
         // Also clean from localStorage if present
         const savedInvoicesString = localStorage.getItem('invoices');
@@ -563,12 +620,16 @@ const InvoiceList = () => {
             }
           } catch {}
         }
-        setShowDeleteModal(false);
-        setInvoiceToDelete(null);
-      } catch (error) {
-        console.error("Error deleting invoice:", error);
-        alert("There was an error deleting the invoice. Please try again.");
+        setDeleteMessage(`Invoice #${invoiceToDelete.invoiceNumber || invoiceToDelete.id} deleted (local).`);
+        setShowDeleteSuccess(true);
+        setTimeout(() => setShowDeleteSuccess(false), 4000);
       }
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      alert(error?.message || "There was an error deleting the invoice. Please try again.");
+    } finally {
+      setShowDeleteModal(false);
+      setInvoiceToDelete(null);
     }
   };
 
@@ -644,6 +705,20 @@ const InvoiceList = () => {
   return (
     <Container fluid>
       <h1 className="mb-4">Invoice List</h1>
+
+      {showDeleteSuccess && (
+        <Alert variant="success" className="d-flex justify-content-between align-items-center">
+          <span><strong>Success:</strong> {deleteMessage}</span>
+          <Button 
+            variant="outline-success" 
+            size="sm" 
+            onClick={() => setShowDeleteSuccess(false)}
+            className="ms-2"
+          >
+            <i className="bi bi-x-lg"></i>
+          </Button>
+        </Alert>
+      )}
       
       {showCsvSuccess && (
         <Alert variant="success" className="d-flex justify-content-between align-items-center csv-success-alert">

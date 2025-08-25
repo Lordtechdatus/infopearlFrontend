@@ -2,6 +2,8 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import './Careerpage.css';
+import { contactImageBase64 } from '../assets';
+import SEO from '../components/SEO';
 
 const fadeIn = {
   hidden: { opacity: 0 },
@@ -108,7 +110,13 @@ const CareerPage = () => {
 
   return (
     <>
-      <motion.div
+    <SEO 
+        title="Career"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/career"
+      />
+      {/* <motion.div
         className="career-banner"
         initial="hidden"
         whileInView="visible"
@@ -116,7 +124,31 @@ const CareerPage = () => {
         variants={fadeIn}
       >
         <h1>Career</h1>
-      </motion.div>
+      </motion.div> */}
+
+      <section className="page-header" style={{ marginTop: 118 }}>
+        <div className="contact-image-container">
+          <img src={contactImageBase64} alt="IT Solutions Contact" className="contact-image" />
+        </div>
+        <div className="container" style={{ backgroundColor: 'transparent' }}>
+          <motion.h1
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            style={{ color: 'white' }}
+          >
+            Career
+          </motion.h1>
+          <motion.div
+            className="breadcrumb"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <span>Home</span> / <span className="active">Career</span>
+          </motion.div>
+        </div>
+      </section>
 
       <motion.div
         className="career-container"

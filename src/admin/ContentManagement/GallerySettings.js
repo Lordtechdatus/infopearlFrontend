@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Form, Badge, Modal, Spinner } from 'react-bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import SEO from '../../components/SEO.js';
 
 const GallerySettings = () => {
   // State for gallery images
@@ -236,6 +237,12 @@ const GallerySettings = () => {
 
   return (
     <Container fluid className="p-4">
+      <SEO 
+        title="Gallery Settings"
+        description="Learn about InfoPearl Tech Solutions - our vision, mission, values, and journey in providing academic research support and innovative IT solutions."
+        keywords="about InfoPearl, company history, vision, mission, values, team, academic research, IT solutions"
+        canonicalUrl="https://infopearl.in/gallery-setting"
+      />
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="mb-1">Gallery Management</h2>

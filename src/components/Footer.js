@@ -64,7 +64,7 @@ const Footer = () => {
 
   return (
     <footer className="footer">
-      <div className="footer-content container">
+      <div className="footer-content container" style={{ backgroundColor: 'transparent' }}>
 
         {/* About & Contact Section */}
         <div className="footer-section about">
